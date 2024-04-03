@@ -16,7 +16,6 @@ public class PlayerCSV {
     @CsvBindByName
     private String lastname;
     @CsvBindByName
-    @Column(unique = true)
     private String email;
     @CsvBindByName
     @CsvDate(value = "yyyy-MM-dd")
