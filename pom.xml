@@ -57,6 +57,13 @@
             <version>RELEASE</version>
             <scope>compile</scope>
         </dependency>
+
+		<!-- Nesesarias para opencsv-->
+		<dependency>
+			<groupId>com.opencsv</groupId>
+			<artifactId>opencsv</artifactId>
+			<version>5.0</version>
+		</dependency>
     </dependencies>
 
 	<build>

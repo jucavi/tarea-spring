@@ -1,31 +1,20 @@
 package com.example.tareaspring.models;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.opencsv.bean.CsvBindByName;
 import com.opencsv.bean.CsvDate;
 import org.springframework.lang.NonNull;
 
 import javax.persistence.*;
-
 import java.time.LocalDate;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 
-@Entity
-//@Table(uniqueConstraints = { @UniqueConstraint(columnNames = {"email" }) })
-public class Player {
+public class PlayerCSV {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @CsvBindByName
     private Long id;
-
     @CsvBindByName
     private String firstname;
     @CsvBindByName
     private String lastname;
-
     @CsvBindByName
     @Column(unique = true)
     private String email;
@@ -33,11 +22,9 @@ public class Player {
     @CsvDate(value = "yyyy-MM-dd")
     private LocalDate birthdate;
     @CsvBindByName
-    @Enumerated(EnumType.STRING)
-    private FieldPosition position;
+    private String position;
     @CsvBindByName
-    @Enumerated(EnumType.STRING)
-    private Gender gender;
+    private String gender;
     @CsvBindByName
     private Double weight;
     @CsvBindByName
@@ -47,39 +34,10 @@ public class Player {
     @CsvBindByName
     private Double fat;
 
-    @JsonIgnore
-    @OneToMany(mappedBy = "player", fetch = FetchType.EAGER, cascade = CascadeType.REMOVE)
-    Set<Signing> signingSet = new HashSet<>();
-
-    public Player() {
+    public PlayerCSV() {
     }
 
-    public Player(
-            Long id,
-            @NonNull String firstname,
-            @NonNull String lastname,
-            @NonNull String email,
-            @NonNull LocalDate birthdate,
-            @NonNull FieldPosition position,
-            @NonNull Gender gender,
-            @NonNull Double weight,
-            @NonNull Double high,
-            @NonNull Double fat) {
-        this.id = id;
-        this.firstname = firstname;
-        this.lastname = lastname;
-        this.email = email;
-        this.birthdate = birthdate;
-        this.position = position;
-        this.gender = gender;
-        this.weight = weight;
-        this.high = high;
-        this.imc = weight / (high * high);
-        // No se si fat es calculable a partir del imc
-        this.fat = fat;
-    }
-
-    public Player(
+    public PlayerCSV(
             Long id,
             @NonNull String firstname,
             @NonNull String lastname,
@@ -87,33 +45,6 @@ public class Player {
             @NonNull LocalDate birthdate,
             @NonNull String position,
             @NonNull String gender,
-            @NonNull Double weight,
-            @NonNull Double high,
-            @NonNull Double fat) {
-        this.id = id;
-        this.firstname = firstname;
-        this.lastname = lastname;
-        this.email = email;
-        this.birthdate = birthdate;
-        // raise IllegalArgumentException
-        this.position = FieldPosition.valueOf(position);
-        // raise IllegalArgumentException
-        this.gender = Gender.valueOf(gender);
-        this.weight = weight;
-        this.high = high;
-        this.imc = weight / (high * high);
-        // No se si fat es calculable a partir del imc
-        this.fat = fat;
-    }
-
-    public Player(
-            Long id,
-            @NonNull String firstname,
-            @NonNull String lastname,
-            @NonNull String email,
-            @NonNull LocalDate birthdate,
-            @NonNull FieldPosition position,
-            @NonNull Gender gender,
             @NonNull Double weight,
             @NonNull Double high,
             @NonNull Double imc,
@@ -171,19 +102,19 @@ public class Player {
         this.birthdate = birthdate;
     }
 
-    public FieldPosition getPosition() {
+    public String getPosition() {
         return position;
     }
 
-    public void setPosition(FieldPosition position) {
+    public void setPosition(String position) {
         this.position = position;
     }
 
-    public Gender getGender() {
+    public String getGender() {
         return gender;
     }
 
-    public void setGender(Gender gender) {
+    public void setGender(String gender) {
         this.gender = gender;
     }
 
@@ -192,10 +123,7 @@ public class Player {
     }
 
     public void setWeight(Double weight) {
-
         this.weight = weight;
-        // ante un cambio del peso se recalcula el imc
-        calculateImc();
     }
 
     public Double getHigh() {
@@ -203,10 +131,7 @@ public class Player {
     }
 
     public void setHigh(Double high) {
-
         this.high = high;
-        // ante un cambio del peso se recalcula el imc
-        calculateImc();
     }
 
     public Double getImc() {
@@ -225,39 +150,36 @@ public class Player {
         this.fat = fat;
     }
 
-    public Set<Signing> getSigningSet() {
-        return signingSet;
-    }
-
-    public void setSigningSet(Set<Signing> signingSet) {
-        this.signingSet = signingSet;
-    }
-
-    /**
-     * Calculate the imc from weight and height
-     */
-    private void calculateImc() {
-        if (this.weight != null && this.high != null && this.weight != 0) {
-            this.imc = this.weight / (this.high * this.high);
-        } else {
-            this.imc = 0.0;
-        }
-    }
-
     @Override
     public String toString() {
-        return "Player{" +
+        return "PlayerCSV{" +
                 "id=" + id +
                 ", firstname='" + firstname + '\'' +
                 ", lastname='" + lastname + '\'' +
                 ", email='" + email + '\'' +
                 ", birthdate=" + birthdate +
                 ", position='" + position + '\'' +
-                ", gender=" + gender +
+                ", gender='" + gender + '\'' +
                 ", weight=" + weight +
                 ", high=" + high +
                 ", imc=" + imc +
                 ", fat=" + fat +
                 '}';
     }
+
+    public Player toBeanWithId() {
+        return new Player(
+                this.id,
+                this.firstname,
+                this.lastname,
+                this.email,
+                this.birthdate,
+                this.position,
+                this.gender,
+                this.weight,
+                this.high,
+                this.fat
+        );
+    }
 }
+
