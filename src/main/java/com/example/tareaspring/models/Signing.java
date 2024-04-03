@@ -1,7 +1,5 @@
 package com.example.tareaspring.models;
 
-import org.jetbrains.annotations.NotNull;
-
 import javax.persistence.*;
 import java.time.LocalDate;
 

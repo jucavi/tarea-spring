@@ -1,15 +1,12 @@
 package com.example.tareaspring.models;
 
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import org.hibernate.annotations.GeneratorType;
 import org.springframework.lang.NonNull;
 
 import javax.persistence.*;
 import java.time.LocalDate;
-import java.util.Date;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -28,7 +25,7 @@ public class Team {
     private String city;
 
     @JsonIgnore
-    @OneToMany(mappedBy = "team", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "team", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
     Set<Signing> signingSet = new HashSet<>();
 
     public Team() {

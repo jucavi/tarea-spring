@@ -1,102 +1,113 @@
 package com.example.tareaspring.controllers;
 
+import com.example.tareaspring.models.Player;
 import com.example.tareaspring.models.Team;
-import com.example.tareaspring.repositories.TeamRepository;
+import com.example.tareaspring.services.TeamService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("api/v1")
 public class TeamController {
 
-    private final TeamRepository repository;
+    private final TeamService service;
 
     // Definimos el logger
     private final Logger log = LoggerFactory.getLogger(TeamController.class);
 
     // Necesario para la inyección de dependencias
-    public TeamController(TeamRepository repository) {
-        this.repository = repository;
+    public TeamController(TeamService service) {
+        this.service = service;
     }
 
     // CRUD sobre la entidad Team
+    /**
+     * Get all teams from database
+     * @return all teams from the database
+     */
     @GetMapping("/teams")
-    public List<Team> findAll() {
-        // recuperar y devolver los equipos de la base de datos
-        log.info("Retrieving all Teams from database");
-        return repository.findAll();
+    public ResponseEntity<List<Team>> findAll() {
+        return ResponseEntity.ok(service.findAll());
     }
 
-    // Buscar un equipo en la base de datos según su Id
+    /**
+     * Find a team from database
+     * @param id team identifier
+     * @return team if exists, otherwise {@code 404 } not found
+     */
     @GetMapping("/teams/{id}")
     public ResponseEntity<Team> findById(@PathVariable Long id) {
+        Team result = service.findById(id);
 
-        Optional<Team> teamOpt = repository.findById(id);
-
-        if (teamOpt.isPresent()) {
-            log.info("Retrieving Team with ID: {}", id);
-            return ResponseEntity.ok(teamOpt.get());
+        if (result != null) {
+            return ResponseEntity.ok(result);
         }
 
-        log.warn("Retrieving Team with wrong ID: {}", id);
         return ResponseEntity.notFound().build();
     }
 
-    // Crear un nuevo equipo en la baae de datos
+    /**
+     * Create a team in the database
+     * @param team team
+     * @return team if created, otherwise {@code 404 } not found
+     */
     @PostMapping("/teams")
     public ResponseEntity<Team> create(@RequestBody Team team) {
+        Team result = service.create(team);
 
-        if (team.getId() != null) {
-            log.warn("Trying to create a Team with duplicate ID: {}", team.getId());
-            return ResponseEntity.badRequest().build();
+        if (result != null) {
+            return ResponseEntity.ok(result);
         }
 
-        // guardar el equipo recibido por parámetro en la base de datos
-        Team result = repository.save(team);
-        log.info("Team created with ID: {}", team.getId());
-
-        return ResponseEntity.ok(result);
-    }
-
-    // Actualizar un equipo en la base de datos
-    @PutMapping("/teams")
-    public ResponseEntity<Team> update(@RequestBody Team team) {
-
-        if (team.getId() != null && !repository.existsById(team.getId())) {
-            log.warn("Trying to update a team with wrong ID");
-            return ResponseEntity.notFound().build();
-        }
-
-        Team result = repository.save(team);
-        log.info("Team updated with ID: {}", team.getId());
-
-        return ResponseEntity.ok(result);
-    }
-
-    // Borrar un equipo de la base de datos
-    @DeleteMapping("/teams/{id}")
-    public ResponseEntity delete(@PathVariable Long id) {
-
-        if (repository.existsById(id)) {
-            repository.deleteById(id);
-            log.info("Team deleted with ID: {}", id);
-            return ResponseEntity.noContent().build();
-        }
-
-        log.warn("Trying to delete a Team with wrong ID");
         return ResponseEntity.notFound().build();
     }
 
-    // Borrar todos los equipos de la base de datos
-    @DeleteMapping("/teams")
-    public ResponseEntity deleteAll() {
-        log.info("Deleting all Teams...");
-        repository.deleteAll();
-        return ResponseEntity.noContent().build();
+    /**
+     * Update team info
+     * @param team team
+     * @return team if updated, otherwise {@code 404 } not found
+     */
+    @PutMapping("/teams")
+    public ResponseEntity<Team> update(@RequestBody Team team) {
+        Team result = service.update(team);
+
+        if (result != null) {
+            return ResponseEntity.ok(result);
+        }
+
+        return ResponseEntity.notFound().build();
+    }
+
+    /**
+     * Delete a team from a database
+     * @param id team identifier
+     * @return {@code true} if a team was deleted, {@code 404 } not found
+     */
+    @DeleteMapping("/teams/{id}")
+    public ResponseEntity<Boolean> delete(@PathVariable Long id) {
+        Boolean result = service.delete(id);
+
+        if (result) {
+            return ResponseEntity.ok(true);
+        }
+
+        return ResponseEntity.notFound().build();
+    }
+
+    /**
+     * Persist all registries from csv file into database
+     * @param file file
+     * @return List of teams persisted, otherwise an empty list
+     */
+    @PostMapping("/teams/upload")
+    public ResponseEntity<List<Team>> upload(@RequestParam("file") MultipartFile file) {
+        List<Team> result =  service.parseCSVFileToTeams(file);
+
+        return ResponseEntity.ok(result);
     }
 }

@@ -4,7 +4,6 @@ import com.opencsv.bean.CsvBindByName;
 import com.opencsv.bean.CsvDate;
 import org.springframework.lang.NonNull;
 
-import javax.persistence.*;
 import java.time.LocalDate;
 
 public class PlayerCSV {
@@ -34,31 +33,6 @@ public class PlayerCSV {
     private Double fat;
 
     public PlayerCSV() {
-    }
-
-    public PlayerCSV(
-            Long id,
-            @NonNull String firstname,
-            @NonNull String lastname,
-            @NonNull String email,
-            @NonNull LocalDate birthdate,
-            @NonNull String position,
-            @NonNull String gender,
-            @NonNull Double weight,
-            @NonNull Double high,
-            @NonNull Double imc,
-            @NonNull Double fat) {
-        this.id = id;
-        this.firstname = firstname;
-        this.lastname = lastname;
-        this.email = email;
-        this.birthdate = birthdate;
-        this.position = position;
-        this.gender = gender;
-        this.weight = weight;
-        this.high = high;
-        this.imc = imc;
-        this.fat = fat;
     }
 
     public Long getId() {
@@ -166,7 +140,12 @@ public class PlayerCSV {
                 '}';
     }
 
+    /**
+     * Returns an instance of Team
+     * @return Team instance
+     */
     public Player toBeanWithId() {
+        // TODO: Check for nulls if file not match with Object properties
         return new Player(
                 this.id,
                 this.firstname,

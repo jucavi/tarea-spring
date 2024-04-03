@@ -1,7 +1,6 @@
 package com.example.tareaspring.controllers;
 
 import com.example.tareaspring.models.Player;
-import com.example.tareaspring.repositories.PlayerRepository;
 import com.example.tareaspring.services.PlayerService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -10,7 +9,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/v1")
@@ -18,55 +16,96 @@ public class PlayerController {
 
     private final PlayerService service;
 
-    // Definimos el logger
     private final Logger log = LoggerFactory.getLogger(PlayerController.class);
 
-    // Necesario para la inyección de dependencias
     public PlayerController(PlayerService service) {
         this.service = service;
     }
 
-    // CRUD sobre la entidad Player
+    /**
+     * Get all players from database
+     * @return all player from the database
+     */
     @GetMapping("/players")
-    public List<Player> findAll() {
-        // recuperar y devolver los jugadores de la base de datos
-        return service.findAll();
+    public ResponseEntity<List<Player>> findAll() {
+        return ResponseEntity.ok(service.findAll());
     }
 
-    // Buscar un jugador en la base de datos según su Id
+
+    /**
+     * Find a player from database
+     * @param id player identifier
+     * @return player if exists, otherwise {@code 404 } not found
+     */
     @GetMapping("/players/{id}")
     public ResponseEntity<Player> findById(@PathVariable Long id) {
-        return service.findById(id);
+        Player result = service.findById(id);
+
+        if (result != null) {
+            return ResponseEntity.ok(result);
+        }
+
+        return ResponseEntity.notFound().build();
     }
 
-    // Crear un nuevo jugador en la baae de datos
+    /**
+     * Create a player in the database
+     * @param player player
+     * @return player if created, otherwise {@code 404 } not found
+     */
     @PostMapping("/players")
     public ResponseEntity<Player> create(@RequestBody Player player) {
-        return service.create(player);
+        Player result = service.create(player);
+
+        if (result != null) {
+            return ResponseEntity.ok(result);
+        }
+
+        return ResponseEntity.notFound().build();
     }
 
-    // Actualizar un jugador en la base de datos
+    /**
+     * Update player info
+     * @param player player
+     * @return player if updated, otherwise {@code 404 } not found
+     */
     @PutMapping("/players")
     public ResponseEntity<Player> update(@RequestBody Player player) {
+        Player result = service.update(player);
 
-        return service.update(player);
+        if (result != null) {
+            return ResponseEntity.ok(result);
+        }
+
+        return ResponseEntity.notFound().build();
     }
 
-    // Borrar un jugador de la base de datos
+    /**
+     * Delete a player from a database
+     * @param id player identifier
+     * @return {@code true} if a player was deleted, {@code 404 } not found
+     */
     @DeleteMapping("/players/{id}")
-    public ResponseEntity delete(@PathVariable Long id) {
+    public ResponseEntity<Boolean> delete(@PathVariable Long id) {
 
-        return service.delete(id);
+        Boolean result = service.delete(id);
+
+        if (result) {
+            return ResponseEntity.ok(true);
+        }
+
+        return ResponseEntity.notFound().build();
     }
 
-    // Borrar todos los jugadores de la base de datos
-    @DeleteMapping("/players")
-    public ResponseEntity deleteAll() {
-        return service.delete();
-    }
-
+    /**
+     * Persist all registries from csv file into database
+     * @param file file
+     * @return List of players persisted, otherwise an empty list
+     */
     @PostMapping("/players/upload")
-    public ResponseEntity upload(@RequestParam("file") MultipartFile file) {
-        return service.parseCSVFileToPlayers(file);
+    public ResponseEntity<List<Player>> upload(@RequestParam("file") MultipartFile file) {
+        List<Player> result =  service.parseCSVFileToPlayers(file);
+
+        return ResponseEntity.ok(result);
     }
 }

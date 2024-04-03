@@ -9,7 +9,6 @@ import javax.persistence.*;
 
 import java.time.LocalDate;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -101,9 +100,9 @@ public class Player {
         this.gender = Gender.valueOf(gender);
         this.weight = weight;
         this.high = high;
-        this.imc = weight / (high * high);
-        // No se si fat es calculable a partir del imc
+        // No se si fat es calculable desde imc
         this.fat = fat;
+        calculateImc();
     }
 
     public Player(

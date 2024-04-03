@@ -7,7 +7,6 @@ import com.opencsv.bean.CsvToBean;
 import com.opencsv.bean.CsvToBeanBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.ResponseEntity;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -30,14 +29,14 @@ public class PlayerService {
     }
 
 
-    public ResponseEntity parseCSVFileToPlayers(@NonNull MultipartFile file) {
+    public List<Player> parseCSVFileToPlayers(@NonNull MultipartFile file) {
 
         List<Player> players = new ArrayList<>();
 
         // validamos que el fichero existe
         if (file.isEmpty()) {
             log.warn("Not CSV file present to upload");
-            return ResponseEntity.noContent().build();
+            return players;
         }
 
         // parsemos el fichero CSV a una lista de objetos Player
@@ -58,10 +57,9 @@ public class PlayerService {
 
         } catch (Exception ex) {
             log.error("An error occurred while processing the CSV file.");
-            return ResponseEntity.badRequest().build();
         }
 
-        return ResponseEntity.ok(players);
+        return players;
     }
 
     public List<Player> findAll() {
@@ -69,60 +67,53 @@ public class PlayerService {
         return repository.findAll();
     }
 
-    public ResponseEntity<Player> findById(Long id) {
+    public Player findById(Long id) {
         Optional<Player> playerOpt = repository.findById(id);
 
         if (playerOpt.isPresent()) {
             log.info("Retrieving Player with ID: {}", id);
-            return ResponseEntity.ok(playerOpt.get());
+            return playerOpt.get();
         }
         log.warn("Retrieving Player with wrong ID: {}", id);
-        return ResponseEntity.notFound().build();
+        return null;
     }
 
-    public ResponseEntity<Player> create(Player player) {
+    public Player create(Player player) {
 
         if (player.getId() != null) {
             log.warn("Trying to create a Player with assigned ID: {}", player.getId());
-            return ResponseEntity.badRequest().build();
+            return null;
         }
 
         // guardar el jugador recibido por parámetro en la base de datos
         Player result = repository.save(player);
         log.info("Player created with ID: {}", player.getId());
 
-        return ResponseEntity.ok(result);
+        return result;
     }
 
-    public ResponseEntity<Player> update(Player player) {
+    public Player update(Player player) {
 
         if (player.getId() != null && !repository.existsById(player.getId())) {
-            log.warn("Trying to update a jugador with wrong ID");
-            return ResponseEntity.notFound().build();
+            log.warn("Trying to update a Player with wrong ID");
+            return null;
         }
 
         Player result = repository.save(player);
         log.info("Player updated with ID: {}", player.getId());
 
-        return ResponseEntity.ok(result);
+        return result;
     }
 
-    public ResponseEntity delete(Long id) {
+    public Boolean delete(Long id) {
 
         if (repository.existsById(id)) {
             repository.deleteById(id);
             log.info("Player deleted with ID: {}", id);
-            return ResponseEntity.noContent().build();
+            return true;
         }
 
         log.warn("Trying to delete a Player with wrong ID");
-        return ResponseEntity.notFound().build();
+        return false;
     }
-
-    public ResponseEntity delete() {
-        log.info("Deleting all Players...");
-        repository.deleteAll();
-        return ResponseEntity.noContent().build();
-    }
-
 }
