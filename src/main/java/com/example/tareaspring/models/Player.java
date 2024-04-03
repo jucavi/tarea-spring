@@ -1,12 +1,17 @@
 package com.example.tareaspring.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.springframework.lang.NonNull;
+
 import javax.persistence.*;
 
 import java.time.LocalDate;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 @Entity
+//@Table(uniqueConstraints = { @UniqueConstraint(columnNames = {"email" }) })
 public class Player {
 
     @Id
@@ -28,25 +33,50 @@ public class Player {
     private Double imc;
     private Double fat;
 
-    @OneToMany(mappedBy = "player")
-    List<Signing> signingSet;
+    @JsonIgnore
+    @OneToMany(mappedBy = "player", fetch = FetchType.EAGER, cascade = CascadeType.REMOVE)
+    Set<Signing> signingSet = new HashSet<>();
 
     public Player() {
     }
 
     public Player(
             Long id,
-            String firstname,
-            String lastname,
-            String email,
-            LocalDate birthdate,
-            FieldPosition position,
-            Gender gender,
-            Double weight,
-            Double high,
-            Double imc,
-            Double fat,
-            List<Signing> signingSet) {
+            @NonNull String firstname,
+            @NonNull String lastname,
+            @NonNull String email,
+            @NonNull LocalDate birthdate,
+            @NonNull FieldPosition position,
+            @NonNull Gender gender,
+            @NonNull Double weight,
+            @NonNull Double high,
+            @NonNull Double fat) {
+        this.id = id;
+        this.firstname = firstname;
+        this.lastname = lastname;
+        this.email = email;
+        this.birthdate = birthdate;
+        this.position = position;
+        this.gender = gender;
+        this.weight = weight;
+        this.high = high;
+        this.imc = weight / (high * high);
+        // No se si fat es calculable a partir del imc
+        this.fat = fat;
+    }
+
+    public Player(
+            Long id,
+            @NonNull String firstname,
+            @NonNull String lastname,
+            @NonNull String email,
+            @NonNull LocalDate birthdate,
+            @NonNull FieldPosition position,
+            @NonNull Gender gender,
+            @NonNull Double weight,
+            @NonNull Double high,
+            @NonNull Double imc,
+            @NonNull Double fat) {
         this.id = id;
         this.firstname = firstname;
         this.lastname = lastname;
@@ -58,7 +88,6 @@ public class Player {
         this.high = high;
         this.imc = imc;
         this.fat = fat;
-        this.signingSet = signingSet;
     }
 
     public Long getId() {
@@ -122,7 +151,10 @@ public class Player {
     }
 
     public void setWeight(Double weight) {
+
         this.weight = weight;
+        // ante un cambio del peso se recalcula el imc
+        calculateImc();
     }
 
     public Double getHigh() {
@@ -130,7 +162,10 @@ public class Player {
     }
 
     public void setHigh(Double high) {
+
         this.high = high;
+        // ante un cambio del peso se recalcula el imc
+        calculateImc();
     }
 
     public Double getImc() {
@@ -149,12 +184,23 @@ public class Player {
         this.fat = fat;
     }
 
-    public List<Signing> getSigningSet() {
+    public Set<Signing> getSigningSet() {
         return signingSet;
     }
 
-    public void setSigningSet(List<Signing> signingSet) {
+    public void setSigningSet(Set<Signing> signingSet) {
         this.signingSet = signingSet;
+    }
+
+    /**
+     * Calculate the imc from weight and height
+     */
+    private void calculateImc() {
+        if (this.weight != null && this.high != null && this.weight != 0) {
+            this.imc = this.weight / (this.high * this.high);
+        } else {
+            this.imc = 0.0;
+        }
     }
 
     @Override

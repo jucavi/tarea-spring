@@ -28,13 +28,13 @@ public class TareaSpringApplication {
 
 
 		// crear un jugador y almacenar
-		Player player = new Player(null, "player", "one", "email@email.es", since, FieldPosition.DEFENZA, Gender.FEMALE, 67.9, 1.78, 0.7, 3.5, new ArrayList<Signing>());
+		Player player = new Player(null, "player", "one", "email@email.es", since, FieldPosition.DEFENZA, Gender.FEMALE, 67.9, 1.78, 0.7);
 		System.out.println("Número de jugadores en la base de datos: " + playerRep.findAll().size());
 		playerRep.save(player);
 		System.out.println("Número de jugadores en la base de datos: " + playerRep.findAll().size());
 
 		// Crear un equipo y almacenar
-		Team team = new Team(null, "player", "teamemail@email.es", since, "Santander",  new ArrayList<Signing>());
+		Team team = new Team(null, "team", "teamemail@email.es", since, "Santander");
 		System.out.println("Número de equipos en la base de datos: " + teamRep.findAll().size());
 		teamRep.save(team);
 		System.out.println("Número de equipos en la base de datos: " + teamRep.findAll().size());

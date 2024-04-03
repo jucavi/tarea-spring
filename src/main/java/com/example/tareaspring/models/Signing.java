@@ -13,12 +13,10 @@ public class Signing {
     private Long id;
 
     @ManyToOne
-    //@MapsId("playerId")
     @JoinColumn(name = "player_id", referencedColumnName = "id")
     Player player;
 
     @ManyToOne
-    //@MapsId("teamId")
     @JoinColumn(name = "team_id", referencedColumnName = "id")
     Team team;
     private LocalDate since;

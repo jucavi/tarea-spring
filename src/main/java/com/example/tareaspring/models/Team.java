@@ -1,10 +1,14 @@
 package com.example.tareaspring.models;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.hibernate.annotations.GeneratorType;
+import org.springframework.lang.NonNull;
 
 import javax.persistence.*;
 import java.time.LocalDate;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -23,19 +27,24 @@ public class Team {
     private LocalDate since;
     private String city;
 
-    @OneToMany(mappedBy = "team")
-    List<Signing> signingSet;
+    @JsonIgnore
+    @OneToMany(mappedBy = "team", fetch = FetchType.LAZY)
+    Set<Signing> signingSet = new HashSet<>();
 
     public Team() {
     }
 
-    public Team(Long id, String name, String email, LocalDate since, String city, List<Signing> signingSet) {
+    public Team(
+            Long id,
+            @NonNull String name,
+            @NonNull String email,
+            @NonNull LocalDate since,
+            @NonNull String city) {
         this.id = id;
         this.name = name;
         this.email = email;
         this.since = since;
         this.city = city;
-        this.signingSet = signingSet;
     }
 
     public Long getId() {
@@ -78,11 +87,11 @@ public class Team {
         this.city = city;
     }
 
-    public List<Signing> getSigningSet() {
+    public Set<Signing> getSigningSet() {
         return signingSet;
     }
 
-    public void setSigningSet(List<Signing> signingSet) {
+    public void setSigningSet(Set<Signing> signingSet) {
         this.signingSet = signingSet;
     }
 }
