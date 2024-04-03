@@ -1,6 +1,5 @@
 package com.example.tareaspring.controllers;
 
-import com.example.tareaspring.models.Player;
 import com.example.tareaspring.models.Team;
 import com.example.tareaspring.services.TeamService;
 import org.slf4j.Logger;
@@ -16,9 +15,6 @@ import java.util.List;
 public class TeamController {
 
     private final TeamService service;
-
-    // Definimos el logger
-    private final Logger log = LoggerFactory.getLogger(TeamController.class);
 
     // Necesario para la inyección de dependencias
     public TeamController(TeamService service) {

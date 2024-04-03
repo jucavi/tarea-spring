@@ -16,8 +16,6 @@ public class PlayerController {
 
     private final PlayerService service;
 
-    private final Logger log = LoggerFactory.getLogger(PlayerController.class);
-
     public PlayerController(PlayerService service) {
         this.service = service;
     }

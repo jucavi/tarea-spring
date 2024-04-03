@@ -1,10 +1,13 @@
 package com.example.tareaspring.services;
 
+import com.example.tareaspring.models.PlayerCSV;
 import com.example.tareaspring.models.Team;
 import com.example.tareaspring.models.TeamCSV;
 import com.example.tareaspring.repositories.TeamRepository;
+import com.opencsv.bean.BeanVerifier;
 import com.opencsv.bean.CsvToBean;
 import com.opencsv.bean.CsvToBeanBuilder;
+import com.opencsv.exceptions.CsvConstraintViolationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.lang.NonNull;
@@ -43,6 +46,17 @@ public class TeamService {
             CsvToBean<TeamCSV> csvToBean = new CsvToBeanBuilder(reader)
                     .withType(TeamCSV.class)
                     .withIgnoreLeadingWhiteSpace(true)
+                    .withVerifier(new BeanVerifier() {
+                        @Override
+                        public boolean verifyBean(Object bean) throws CsvConstraintViolationException {
+                            TeamCSV b = (TeamCSV) bean;
+                            // Todas propiedades nulas
+                            if (b == null) {
+                                return false;
+                            }
+                            return true;
+                        }
+                    })
                     .build();
 
             List<TeamCSV> teamsObj = csvToBean.parse();

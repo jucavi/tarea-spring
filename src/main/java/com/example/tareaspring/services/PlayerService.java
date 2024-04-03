@@ -3,8 +3,10 @@ package com.example.tareaspring.services;
 import com.example.tareaspring.models.Player;
 import com.example.tareaspring.models.PlayerCSV;
 import com.example.tareaspring.repositories.PlayerRepository;
+import com.opencsv.bean.BeanVerifier;
 import com.opencsv.bean.CsvToBean;
 import com.opencsv.bean.CsvToBeanBuilder;
+import com.opencsv.exceptions.CsvConstraintViolationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.lang.NonNull;
@@ -42,8 +44,19 @@ public class PlayerService {
         // parsemos el fichero CSV a una lista de objetos Player
         try (Reader reader = new BufferedReader(new InputStreamReader(file.getInputStream()))) {
             CsvToBean<PlayerCSV> csvToBean = new CsvToBeanBuilder(reader)
-                    .withType(PlayerCSV.class)
                     .withIgnoreLeadingWhiteSpace(true)
+                    .withType(PlayerCSV.class)
+                    .withVerifier(new BeanVerifier() {
+                        @Override
+                        public boolean verifyBean(Object bean) throws CsvConstraintViolationException {
+                            PlayerCSV b = (PlayerCSV) bean;
+                            // Todas propiedades nulas
+                            if (b == null) {
+                                return false;
+                            }
+                            return true;
+                        }
+                    })
                     .build();
 
             List<PlayerCSV> playersObj = csvToBean.parse();
