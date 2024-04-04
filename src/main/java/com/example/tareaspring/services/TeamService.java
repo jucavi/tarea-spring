@@ -130,4 +130,9 @@ public class TeamService {
         log.warn("Trying to delete a Team with wrong ID");
         return false;
     }
+
+    /*
+     TODO: Validate Entity
+        email
+     */
 }

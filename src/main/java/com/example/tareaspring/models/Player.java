@@ -17,33 +17,20 @@ public class Player {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @CsvBindByName
     private Long id;
-
-    @CsvBindByName
     private String firstname;
-    @CsvBindByName
     private String lastname;
-
-    @CsvBindByName
     @Column(unique = true)
     private String email;
-    @CsvBindByName
     @CsvDate(value = "yyyy-MM-dd")
     private LocalDate birthdate;
-    @CsvBindByName
     @Enumerated(EnumType.STRING)
     private FieldPosition position;
-    @CsvBindByName
     @Enumerated(EnumType.STRING)
     private Gender gender;
-    @CsvBindByName
     private Double weight;
-    @CsvBindByName
     private Double high;
-    @CsvBindByName
     private Double imc;
-    @CsvBindByName
     private Double fat;
 
     @JsonIgnore

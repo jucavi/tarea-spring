@@ -2,6 +2,7 @@ package com.example.tareaspring.services;
 
 import com.example.tareaspring.models.Player;
 import com.example.tareaspring.models.Signing;
+import com.example.tareaspring.models.Team;
 import com.example.tareaspring.repositories.SigningRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,14 +48,34 @@ public class SigningService {
 
         List<Signing> signingsOpt = repository.findByTeamAndPlayer(signing.getTeam(), signing.getPlayer());
 
+        /*
+        TODO:
+            If player at current date is signing, then
+                if it is same team and 'until date' is grater than actual player 'until date', then
+                    * (extend signing)
+                        * Check for squad number
+                        * Update 'until date' with new 'until date'
+                    * Write logs
+                if it is not the same team and 'until date' is greater than current date, then
+                    * (new signing)
+                        * if 'since date' is before or equal current date and new 'until date' is after current date
+                            * Check for squad number
+                            * Close current signing 'until date' with current date and update 'since date' to current date to the new signing
+                        * if since date is a after de current date and new 'until date' is after current date
+                            * Check for squad number
+                            * keep all data
+            If player at current date is not signing, then
+                * Check for squad number
 
-
+        */
         // guardar el ???? recibido por parámetro en la base de datos
-        Signing result = repository.save(signing);
+        //Signing result = repository.save(signing);
         log.info("Player created with ID: {}", signing.getId());
 
-        return result;
+        //return result;
+        return null;
     }
+
 
     public Boolean delete(Long id) {
 
@@ -67,4 +88,10 @@ public class SigningService {
         log.warn("Trying to delete a Signing with wrong ID");
         return false;
     }
+
+    /*
+     TODO: Validate Entity
+        since > until
+        squadNumber [0-99]
+     */
 }

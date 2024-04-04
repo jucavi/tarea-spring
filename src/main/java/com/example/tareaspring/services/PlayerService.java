@@ -131,4 +131,9 @@ public class PlayerService {
         log.warn("Trying to delete a Player with wrong ID");
         return false;
     }
+
+    /*
+     TODO: Validate Entity
+        email
+     */
 }
