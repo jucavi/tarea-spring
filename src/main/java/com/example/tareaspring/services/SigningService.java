@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.Mapping;
 import java.util.List;
 import java.util.Optional;
 
+// TODO: Move to Lombok @log annotation
 @Service
 public class SigningService {
 

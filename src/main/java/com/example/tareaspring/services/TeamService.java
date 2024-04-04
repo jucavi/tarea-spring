@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+// TODO: Move to Lombok @log annotation
 @Service
 public class TeamService {
 
@@ -31,6 +32,7 @@ public class TeamService {
         this.repository = repository;
     }
 
+    // TODO: Refactorize
     public List<Team> parseCSVFileToTeams(@NonNull MultipartFile file) {
 
         List<Team> teams = new ArrayList<>();

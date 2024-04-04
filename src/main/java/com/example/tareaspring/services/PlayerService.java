@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+// TODO: Move to Lombok @log annotation
 @Service
 public class PlayerService {
 
@@ -31,6 +32,7 @@ public class PlayerService {
     }
 
 
+    // TODO: Refactorize
     public List<Player> parseCSVFileToPlayers(@NonNull MultipartFile file) {
 
         List<Player> players = new ArrayList<>();
