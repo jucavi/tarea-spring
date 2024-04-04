@@ -2,12 +2,11 @@ package com.example.tareaspring.controllers;
 
 import com.example.tareaspring.models.Player;
 import com.example.tareaspring.models.Signing;
+import com.example.tareaspring.models.Team;
 import com.example.tareaspring.services.SigningService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -44,5 +43,33 @@ public class SigningController {
         }
 
         return ResponseEntity.notFound().build();
+    }
+
+    /**
+     * Create a Signing in the database
+     * @param signing signing
+     * @return player if created, otherwise {@code 404 } not found
+     */
+    @PostMapping("/signings")
+    public ResponseEntity<Signing> create(@RequestBody Signing signing) {
+        Signing result = service.create(signing);
+
+        if (result != null) {
+            return ResponseEntity.ok(result);
+        }
+
+        return ResponseEntity.notFound().build();
+    }
+
+    /**
+     * Persist all registries from csv file into database
+     * @param file file
+     * @return List of signings persisted, otherwise an empty list
+     */
+    @PostMapping("/signings/upload")
+    public ResponseEntity<List<Signing>> upload(@RequestParam("file") MultipartFile file) {
+        List<Signing> result =  service.parseCSVFileToSignings(file);
+
+        return ResponseEntity.ok(result);
     }
 }

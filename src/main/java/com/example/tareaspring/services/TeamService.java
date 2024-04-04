@@ -7,6 +7,7 @@ import com.opencsv.bean.BeanVerifier;
 import com.opencsv.bean.CsvToBean;
 import com.opencsv.bean.CsvToBeanBuilder;
 import com.opencsv.exceptions.CsvConstraintViolationException;
+import lombok.extern.log4j.Log4j2;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.lang.NonNull;
@@ -22,9 +23,8 @@ import java.util.Optional;
 
 // TODO: Move to Lombok @log annotation
 @Service
+@Log4j2
 public class TeamService {
-
-    private final Logger log = LoggerFactory.getLogger(TeamService.class);
     private final TeamRepository repository;
 
     public TeamService(TeamRepository repository) {
@@ -63,11 +63,15 @@ public class TeamService {
             List<TeamCSV> teamsObj = csvToBean.parse();
 
             for (TeamCSV p : teamsObj) {
-                Team Team = p.toBeanWithId();
-                teams.add(Team);
-            }
+                Team team = p.toBeanWithId();
+                try {
+                    repository.save(team);
+                    teams.add(team);
 
-            repository.saveAll(teams);
+                } catch (Exception ex) {
+                    log.error("{} can't be saved: {}", team, ex.getMessage());
+                }
+            }
 
         } catch (Exception ex) {
             log.error("An error occurred while processing the CSV file.");

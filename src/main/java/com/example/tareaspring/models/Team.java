@@ -2,6 +2,10 @@ package com.example.tareaspring.models;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.Data;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.springframework.lang.NonNull;
 
 import javax.persistence.*;
@@ -10,26 +14,31 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Entity
+@Setter
+@Getter
+@Data
+@NoArgsConstructor
 //@UniqueConstraint(columnNames = {"email", "name"})
+// TODO: Maybe unique constrain (name, city, since)
 public class Team {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(unique = true)
+    @Column(unique = true, nullable = false)
     private String name;
-    @Column(unique = true)
+    @Column(unique = true, nullable = false)
     private String email;
+    @Column(nullable = false)
     private LocalDate since;
+    @Column(nullable = false)
     private String city;
 
     @JsonIgnore
     @OneToMany(mappedBy = "team", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
     Set<Signing> signingSet = new HashSet<>();
 
-    public Team() {
-    }
 
     public Team(
             Long id,
@@ -44,51 +53,4 @@ public class Team {
         this.city = city;
     }
 
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public LocalDate getSince() {
-        return since;
-    }
-
-    public void setSince(LocalDate since) {
-        this.since = since;
-    }
-
-    public String getCity() {
-        return city;
-    }
-
-    public void setCity(String city) {
-        this.city = city;
-    }
-
-    public Set<Signing> getSigningSet() {
-        return signingSet;
-    }
-
-    public void setSigningSet(Set<Signing> signingSet) {
-        this.signingSet = signingSet;
-    }
 }

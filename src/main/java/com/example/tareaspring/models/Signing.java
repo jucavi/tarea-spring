@@ -1,5 +1,7 @@
 package com.example.tareaspring.models;
 
+import lombok.ToString;
+
 import javax.persistence.*;
 import java.time.LocalDate;
 
@@ -24,7 +26,8 @@ public class Signing {
     public Signing() {
     }
 
-    public Signing(Player player, Team team, LocalDate since, LocalDate until, Integer squadNumber) {
+    public Signing(Long id, Player player, Team team, LocalDate since, LocalDate until, Integer squadNumber) {
+        this.id = id;
         this.since = since;
         this.player = player;
         this.team = team;
@@ -78,5 +81,17 @@ public class Signing {
 
     public void setSquadNumber(Integer squadNumber) {
         this.squadNumber = squadNumber;
+    }
+
+    @Override
+    public String toString() {
+        return "Signing{" +
+                "id=" + id +
+                ", player_id=" + player.getId() +
+                ", team_id=" + team.getId() +
+                ", since=" + since +
+                ", until=" + until +
+                ", squadNumber=" + squadNumber +
+                '}';
     }
 }

@@ -45,7 +45,7 @@ public class TareaSpringApplication {
 		Player p = op.orElseThrow();
 		Team t = ot.orElseThrow();
 
-		Signing signing = new Signing(p, t, since, until, 66);
+		Signing signing = new Signing(null, p, t, since, until, 66);
 		System.out.println("Número de joining data en la base de datos: " + signRep.findAll().size());
 		signRep.save(signing);
 		System.out.println("Número de joining data en la base de datos: " + signRep.findAll().size());

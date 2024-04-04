@@ -7,6 +7,7 @@ import javax.persistence.*;
 
 import java.time.LocalDate;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 @Entity
@@ -17,21 +18,29 @@ public class Player {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    //@NotEmpty(message = "Firstname cannot be empty")
+    @Column(nullable = false)
     private String firstname;
+    @Column(nullable = false)
     //@NotEmpty(message = "Lastname cannot be empty")
     private String lastname;
-    @Column(unique = true)
+    @Column(unique = true, nullable = false)
     //@Pattern(regexp = "^[a-zA-Z0-9_!#$%&'*+/=?`{|}~^.-]+@[a-zA-Z0-9.-]+$")
     private String email;
+    @Column(nullable = false)
     private LocalDate birthdate;
+    @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private FieldPosition position;
+    @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private Gender gender;
+    @Column(nullable = false)
     private Double weight;
+    @Column(nullable = false)
     private Double high;
+    @Column(nullable = false)
     private Double imc;
+    @Column(nullable = false)
     private Double fat;
 
     @JsonIgnore
@@ -229,6 +238,22 @@ public class Player {
         } else {
             this.imc = 0.0;
         }
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Player)) return false;
+        Player player = (Player) o;
+        return Objects.equals(getFirstname(), player.getFirstname())
+                && Objects.equals(getLastname(), player.getLastname())
+                && Objects.equals(getEmail(), player.getEmail())
+                && Objects.equals(getBirthdate(), player.getBirthdate());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getFirstname(), getLastname(), getEmail(), getBirthdate());
     }
 
     @Override

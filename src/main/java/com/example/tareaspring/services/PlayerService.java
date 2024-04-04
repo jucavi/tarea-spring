@@ -7,6 +7,7 @@ import com.opencsv.bean.BeanVerifier;
 import com.opencsv.bean.CsvToBean;
 import com.opencsv.bean.CsvToBeanBuilder;
 import com.opencsv.exceptions.CsvConstraintViolationException;
+import lombok.extern.log4j.Log4j2;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.lang.NonNull;
@@ -21,10 +22,10 @@ import java.util.List;
 import java.util.Optional;
 
 // TODO: Move to Lombok @log annotation
+@Log4j2
 @Service
 public class PlayerService {
 
-    private final Logger log = LoggerFactory.getLogger(PlayerService.class);
     private final PlayerRepository repository;
 
     public PlayerService(PlayerRepository repository) {
