@@ -1,8 +1,6 @@
 package com.example.tareaspring.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.opencsv.bean.CsvBindByName;
-import com.opencsv.bean.CsvDate;
 import org.springframework.lang.NonNull;
 
 import javax.persistence.*;
@@ -18,11 +16,14 @@ public class Player {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    //@NotEmpty(message = "Firstname cannot be empty")
     private String firstname;
+    //@NotEmpty(message = "Lastname cannot be empty")
     private String lastname;
     @Column(unique = true)
+    //@Pattern(regexp = "^[a-zA-Z0-9_!#$%&'*+/=?`{|}~^.-]+@[a-zA-Z0-9.-]+$")
     private String email;
-    @CsvDate(value = "yyyy-MM-dd")
     private LocalDate birthdate;
     @Enumerated(EnumType.STRING)
     private FieldPosition position;

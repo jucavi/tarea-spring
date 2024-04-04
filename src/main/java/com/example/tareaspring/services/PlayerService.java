@@ -1,7 +1,7 @@
 package com.example.tareaspring.services;
 
 import com.example.tareaspring.models.Player;
-import com.example.tareaspring.models.PlayerCSV;
+import com.example.tareaspring.csvmodels.PlayerCSV;
 import com.example.tareaspring.repositories.PlayerRepository;
 import com.opencsv.bean.BeanVerifier;
 import com.opencsv.bean.CsvToBean;
