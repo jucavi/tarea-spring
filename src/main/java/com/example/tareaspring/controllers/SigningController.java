@@ -1,9 +1,7 @@
 package com.example.tareaspring.controllers;
 
-import com.example.tareaspring.models.Player;
 import com.example.tareaspring.models.Signing;
-import com.example.tareaspring.models.Team;
-import com.example.tareaspring.services.SigningService;
+import com.example.tareaspring.services.SigningServiceImp;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -14,9 +12,9 @@ import java.util.List;
 @RequestMapping("api/v1/")
 public class SigningController {
 
-    private final SigningService service;
+    private final SigningServiceImp service;
 
-    public SigningController(SigningService service) {
+    public SigningController(SigningServiceImp service) {
         this.service = service;
     }
 

@@ -1,10 +1,9 @@
-package com.example.tareaspring.csvmodels;
+package com.example.tareaspring.csv;
 
 import com.example.tareaspring.models.Team;
 import com.opencsv.bean.CsvBindByName;
 import com.opencsv.bean.CsvDate;
 import lombok.*;
-import org.springframework.lang.NonNull;
 
 import java.time.LocalDate;
 

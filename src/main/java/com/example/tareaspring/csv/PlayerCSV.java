@@ -1,4 +1,4 @@
-package com.example.tareaspring.csvmodels;
+package com.example.tareaspring.csv;
 
 import com.example.tareaspring.models.Player;
 import com.opencsv.bean.CsvBindByName;
@@ -7,7 +7,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-import org.springframework.lang.NonNull;
 
 import java.time.LocalDate;
 

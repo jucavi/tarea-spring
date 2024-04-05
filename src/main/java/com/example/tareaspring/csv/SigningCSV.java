@@ -1,16 +1,15 @@
-package com.example.tareaspring.csvmodels;
+package com.example.tareaspring.csv;
 
 import com.example.tareaspring.models.Player;
 import com.example.tareaspring.models.Signing;
 import com.example.tareaspring.models.Team;
 import com.opencsv.bean.CsvBindByName;
+import com.opencsv.bean.CsvDate;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
 import java.time.LocalDate;
 
 @Setter
@@ -22,12 +21,14 @@ public class SigningCSV {
     @CsvBindByName(required = true)
     private Long id;
     @CsvBindByName(required = true, column = "playerId")
-    Player player;
+    Long playerId;
     @CsvBindByName(required = true, column = "teamId")
-    Team team;
+    Long teamId;
     @CsvBindByName(required = true)
+    @CsvDate(value = "yyyy-MM-dd")
     private LocalDate since;
     @CsvBindByName(required = true)
+    @CsvDate(value = "yyyy-MM-dd")
     private LocalDate until;
     @CsvBindByName
     private Integer squadNumber;
@@ -37,8 +38,8 @@ public class SigningCSV {
         Player player = new Player();
         Team team = new Team();
 
-        player.setId(this.player.getId());
-        team.setId(this.team.getId());
+        player.setId(this.playerId);
+        team.setId(this.teamId);
 
         return new Signing(
              this.id,

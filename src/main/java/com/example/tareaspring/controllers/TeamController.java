@@ -1,9 +1,7 @@
 package com.example.tareaspring.controllers;
 
 import com.example.tareaspring.models.Team;
-import com.example.tareaspring.services.TeamService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.example.tareaspring.services.TeamServiceImp;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -14,10 +12,10 @@ import java.util.List;
 @RequestMapping("api/v1")
 public class TeamController {
 
-    private final TeamService service;
+    private final TeamServiceImp service;
 
     // Necesario para la inyección de dependencias
-    public TeamController(TeamService service) {
+    public TeamController(TeamServiceImp service) {
         this.service = service;
     }
 
@@ -86,7 +84,7 @@ public class TeamController {
      */
     @DeleteMapping("/teams/{id}")
     public ResponseEntity<Boolean> delete(@PathVariable Long id) {
-        Boolean result = service.delete(id);
+        Boolean result = service.deleteById(id);
 
         if (result) {
             return ResponseEntity.ok(true);

@@ -1,9 +1,7 @@
 package com.example.tareaspring.services;
 
-import com.example.tareaspring.csv.SigningCSV;
 import com.example.tareaspring.models.Player;
 import com.example.tareaspring.csv.PlayerCSV;
-import com.example.tareaspring.models.Signing;
 import com.example.tareaspring.repositories.PlayerRepository;
 import com.opencsv.bean.BeanVerifier;
 import com.opencsv.bean.CsvToBean;
@@ -24,16 +22,17 @@ import java.util.Optional;
 // TODO: Move to Lombok @log annotation
 @Log4j2
 @Service
-public class PlayerService {
+public class PlayerServiceImp implements PlayerService {
 
     private final PlayerRepository repository;
 
-    public PlayerService(PlayerRepository repository) {
+    public PlayerServiceImp(PlayerRepository repository) {
         this.repository = repository;
     }
 
 
     // TODO: Refactorize
+    @Override
     public List<Player> parseCSVFileToPlayers(@NonNull MultipartFile file) {
 
         List<Player> players = new ArrayList<>();
@@ -82,11 +81,13 @@ public class PlayerService {
         return players;
     }
 
+    @Override
     public List<Player> findAll() {
         log.info("Retrieving all Teams from database");
         return repository.findAll();
     }
 
+    @Override
     public Player findById(Long id) {
         Optional<Player> playerOpt = repository.findById(id);
 
@@ -98,6 +99,7 @@ public class PlayerService {
         return null;
     }
 
+    @Override
     public Player create(Player player) {
 
         if (player.getId() != null) {
@@ -112,6 +114,7 @@ public class PlayerService {
         return result;
     }
 
+    @Override
     public Player update(Player player) {
 
         if (player.getId() != null && !repository.existsById(player.getId())) {
@@ -125,7 +128,8 @@ public class PlayerService {
         return result;
     }
 
-    public Boolean delete(Long id) {
+    @Override
+    public Boolean deleteById(Long id) {
 
         if (repository.existsById(id)) {
             repository.deleteById(id);

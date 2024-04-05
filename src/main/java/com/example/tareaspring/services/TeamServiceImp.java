@@ -22,14 +22,15 @@ import java.util.Optional;
 // TODO: Move to Lombok @log annotation
 @Service
 @Log4j2
-public class TeamService {
+public class TeamServiceImp implements TeamService {
     private final TeamRepository repository;
 
-    public TeamService(TeamRepository repository) {
+    public TeamServiceImp(TeamRepository repository) {
         this.repository = repository;
     }
 
     // TODO: Refactorize
+    @Override
     public List<Team> parseCSVFileToTeams(@NonNull MultipartFile file) {
 
         List<Team> teams = new ArrayList<>();
@@ -78,11 +79,13 @@ public class TeamService {
         return teams;
     }
 
+    @Override
     public List<Team> findAll() {
         log.info("Retrieving all Teams from database");
         return repository.findAll();
     }
 
+    @Override
     public Team findById(Long id) {
         Optional<Team> teamOpt = repository.findById(id);
 
@@ -94,6 +97,7 @@ public class TeamService {
         return null;
     }
 
+    @Override
     public Team create(Team team) {
 
         if (team.getId() != null) {
@@ -107,6 +111,7 @@ public class TeamService {
         return result;
     }
 
+    @Override
     public Team update(Team team) {
 
         if (team.getId() != null && !repository.existsById(team.getId())) {
@@ -120,7 +125,8 @@ public class TeamService {
         return result;
     }
 
-    public Boolean delete(Long id) {
+    @Override
+    public Boolean deleteById(Long id) {
 
         if (repository.existsById(id)) {
             repository.deleteById(id);

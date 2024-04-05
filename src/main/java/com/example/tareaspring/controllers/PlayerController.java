@@ -1,9 +1,7 @@
 package com.example.tareaspring.controllers;
 
 import com.example.tareaspring.models.Player;
-import com.example.tareaspring.services.PlayerService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.example.tareaspring.services.PlayerServiceImp;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -14,9 +12,9 @@ import java.util.List;
 @RequestMapping("/api/v1")
 public class PlayerController {
 
-    private final PlayerService service;
+    private final PlayerServiceImp service;
 
-    public PlayerController(PlayerService service) {
+    public PlayerController(PlayerServiceImp service) {
         this.service = service;
     }
 
@@ -86,7 +84,7 @@ public class PlayerController {
     @DeleteMapping("/players/{id}")
     public ResponseEntity<Boolean> delete(@PathVariable Long id) {
 
-        Boolean result = service.delete(id);
+        Boolean result = service.deleteById(id);
 
         if (result) {
             return ResponseEntity.ok(true);
