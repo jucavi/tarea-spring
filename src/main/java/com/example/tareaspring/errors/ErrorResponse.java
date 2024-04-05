@@ -1,4 +1,4 @@
-package com.example.tareaspring.erros;
+package com.example.tareaspring.errors;
 
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;

@@ -1,9 +1,10 @@
-package com.example.tareaspring.erros;
+package com.example.tareaspring.errors;
 
 import lombok.NoArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -34,8 +35,7 @@ public class GlobalExceptionHandler {
         return errors;
     }
 
-
-    @ExceptionHandler(Exception.class)
+    @ExceptionHandler({HttpMessageNotReadableException.class, Exception.class})
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ResponseEntity<ErrorResponse> handleUncaughtException(Exception exception, WebRequest request) {
 
