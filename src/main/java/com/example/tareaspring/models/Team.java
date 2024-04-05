@@ -1,7 +1,6 @@
 package com.example.tareaspring.models;
 
 
-import com.example.tareaspring.utils.validators.date.CustomDateConstraint;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
@@ -39,7 +38,8 @@ public class Team {
     private String email;
 
     @NotNull
-    @CustomDateConstraint(message = "Date in format YYYY-MM-DD")
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+    @JsonFormat(pattern = "yyyy-MM-dd")
     @Column(nullable = false)
     private LocalDate since;
 

@@ -10,7 +10,7 @@ import javax.validation.Valid;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/v1")
+@RequestMapping("/api/v1/players")
 public class PlayerController {
 
     private final PlayerServiceImp service;
@@ -23,7 +23,7 @@ public class PlayerController {
      * Get all players from database
      * @return all player from the database
      */
-    @GetMapping("/players")
+    @GetMapping
     public ResponseEntity<List<Player>> findAll() {
         return ResponseEntity.ok(service.findAll());
     }
@@ -34,7 +34,7 @@ public class PlayerController {
      * @param id player identifier
      * @return player if exists, otherwise {@code 404 } not found
      */
-    @GetMapping("/players/{id}")
+    @GetMapping("/{id}")
     public ResponseEntity<Player> findById(@PathVariable Long id) {
         Player result = service.findById(id);
 
@@ -50,7 +50,7 @@ public class PlayerController {
      * @param player player
      * @return player if created, otherwise {@code 404 } not found
      */
-    @PostMapping("/players")
+    @PostMapping
     public ResponseEntity<Player> create(@RequestBody @Valid Player player) {
         Player result = service.create(player);
 
@@ -66,7 +66,7 @@ public class PlayerController {
      * @param player player
      * @return player if updated, otherwise {@code 404 } not found
      */
-    @PutMapping("/players")
+    @PutMapping
     public ResponseEntity<Player> update(@RequestBody @Valid  Player player) {
         Player result = service.update(player);
 
@@ -82,7 +82,7 @@ public class PlayerController {
      * @param id player identifier
      * @return {@code true} if a player was deleted, {@code 404 } not found
      */
-    @DeleteMapping("/players/{id}")
+    @DeleteMapping("/{id}")
     public ResponseEntity<Boolean> delete(@PathVariable Long id) {
 
         Boolean result = service.deleteById(id);
@@ -99,7 +99,7 @@ public class PlayerController {
      * @param file file
      * @return List of players persisted, otherwise an empty list
      */
-    @PostMapping("/players/upload")
+    @PostMapping("/upload")
     public ResponseEntity<List<Player>> upload(@RequestParam("file") MultipartFile file) {
         List<Player> result =  service.parseCSVFileToPlayers(file);
 
