@@ -4,6 +4,9 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.springframework.lang.NonNull;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
 
 import java.time.LocalDate;
 import java.util.HashSet;
@@ -18,28 +21,45 @@ public class Player {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotBlank(message = "Firstname can't be empty")
     @Column(nullable = false)
     private String firstname;
+
     @Column(nullable = false)
-    //@NotEmpty(message = "Lastname cannot be empty")
+    @NotBlank(message = "Lastname can't be empty")
     private String lastname;
+
     @Column(unique = true, nullable = false)
-    //@Pattern(regexp = "^[a-zA-Z0-9_!#$%&'*+/=?`{|}~^.-]+@[a-zA-Z0-9.-]+$")
+    @Pattern(regexp = "^[a-zA-Z0-9_!#$%&'*+=?`{|}~^.-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{1,4}$", message = "Invalid email")
     private String email;
+
+    @NotNull
     @Column(nullable = false)
     private LocalDate birthdate;
+
+    @NotNull(message = "Position can't be null")
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private FieldPosition position;
+
+    @NotNull(message = "Gender can't be null")
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private Gender gender;
+
+    @NotNull
     @Column(nullable = false)
     private Double weight;
+
+    @NotNull
     @Column(nullable = false)
     private Double high;
+
+    @NotNull
     @Column(nullable = false)
     private Double imc;
+
+    @NotNull
     @Column(nullable = false)
     private Double fat;
 

@@ -1,7 +1,7 @@
 package com.example.tareaspring.services;
 
 import com.example.tareaspring.models.Player;
-import com.example.tareaspring.csv.PlayerCSV;
+import com.example.tareaspring.dto.PlayerCSV;
 import com.example.tareaspring.repositories.PlayerRepository;
 import com.opencsv.bean.BeanVerifier;
 import com.opencsv.bean.CsvToBean;
@@ -67,6 +67,8 @@ public class PlayerServiceImp implements PlayerService {
                 Player player = o.toBeanWithId();
                 try {
                     repository.save(player);
+                    // Todo: implement to
+                    //this.create(player);
                     players.add(player);
 
                 } catch (Exception ex) {
@@ -107,10 +109,9 @@ public class PlayerServiceImp implements PlayerService {
             return null;
         }
 
-        // guardar el jugador recibido por parámetro en la base de datos
         Player result = repository.save(player);
-        log.info("Player created with ID: {}", player.getId());
 
+        log.info("Player created with ID: {}", player.getId());
         return result;
     }
 

@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @RestController
@@ -50,7 +51,7 @@ public class PlayerController {
      * @return player if created, otherwise {@code 404 } not found
      */
     @PostMapping("/players")
-    public ResponseEntity<Player> create(@RequestBody Player player) {
+    public ResponseEntity<Player> create(@RequestBody @Valid Player player) {
         Player result = service.create(player);
 
         if (result != null) {
@@ -66,7 +67,7 @@ public class PlayerController {
      * @return player if updated, otherwise {@code 404 } not found
      */
     @PutMapping("/players")
-    public ResponseEntity<Player> update(@RequestBody Player player) {
+    public ResponseEntity<Player> update(@RequestBody @Valid  Player player) {
         Player result = service.update(player);
 
         if (result != null) {

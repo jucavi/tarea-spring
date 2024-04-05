@@ -1,4 +1,4 @@
-package com.example.tareaspring.csv;
+package com.example.tareaspring.dto;
 
 import com.example.tareaspring.models.Player;
 import com.opencsv.bean.CsvBindByName;

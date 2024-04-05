@@ -1,6 +1,6 @@
 package com.example.tareaspring.services;
 
-import com.example.tareaspring.csv.SigningCSV;
+import com.example.tareaspring.dto.SigningCSV;
 import com.example.tareaspring.models.Player;
 import com.example.tareaspring.models.Signing;
 import com.example.tareaspring.models.Team;

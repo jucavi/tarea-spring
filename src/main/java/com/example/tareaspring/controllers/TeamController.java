@@ -54,11 +54,7 @@ public class TeamController {
     public ResponseEntity<Team> create(@RequestBody Team team) {
         Team result = service.create(team);
 
-        if (result != null) {
-            return ResponseEntity.ok(result);
-        }
-
-        return ResponseEntity.notFound().build();
+        return ResponseEntity.ok(result);
     }
 
     /**
