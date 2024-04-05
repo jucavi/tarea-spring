@@ -1,5 +1,6 @@
 package com.example.tareaspring.models;
 
+import com.example.tareaspring.utils.validators.DateRange;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.*;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -15,6 +16,7 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @Getter
 @Setter
+@DateRange(before = "since", after = "until", message = "'since' date should be before than 'until' date")
 public class Signing {
 
     @Id
@@ -44,8 +46,8 @@ public class Signing {
     private LocalDate until;
 
     //@NotNull // for csv
-    @Min(value = 0, message = "Squad number must be greater or equal than 0")
-    @Max(value = 99, message = "Squad number must be lesser or equal than 99")
+    @Min(value = 0, message = "Squad number should be greater or equal than 0")
+    @Max(value = 99, message = "Squad number should be lesser or equal than 99")
     private Integer squadNumber;
 
     @Override
