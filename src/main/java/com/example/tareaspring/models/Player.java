@@ -2,9 +2,7 @@ package com.example.tareaspring.models;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.lang.NonNull;
 
@@ -21,6 +19,8 @@ import java.util.Set;
 @Getter
 @Setter
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 //@Table(uniqueConstraints = { @UniqueConstraint(columnNames = {"email" }) })
 public class Player {
 
@@ -85,8 +85,6 @@ public class Player {
     @OneToMany(mappedBy = "player", fetch = FetchType.EAGER, cascade = CascadeType.REMOVE)
     Set<Signing> signingSet = new HashSet<>();
 
-    public Player() {
-    }
 
     public Player(
             Long id,
