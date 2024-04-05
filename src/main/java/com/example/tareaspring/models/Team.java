@@ -3,11 +3,8 @@ package com.example.tareaspring.models;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.lang.NonNull;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
@@ -20,9 +17,10 @@ import java.util.Set;
 @Entity
 @Setter
 @Getter
+@Builder
 @NoArgsConstructor
-//@UniqueConstraint(columnNames = {"email", "name"})
-// TODO: Maybe unique constrain (name, city, since)
+@AllArgsConstructor
+@ToString
 public class Team {
 
     @Id
@@ -50,19 +48,4 @@ public class Team {
     @JsonIgnore
     @OneToMany(mappedBy = "team", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
     Set<Signing> signingSet = new HashSet<>();
-
-
-    public Team(
-            Long id,
-            @NonNull String name,
-            @NonNull String email,
-            @NonNull LocalDate since,
-            @NonNull String city) {
-        this.id = id;
-        this.name = name;
-        this.email = email;
-        this.since = since;
-        this.city = city;
-    }
-
 }

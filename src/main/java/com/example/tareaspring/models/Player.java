@@ -11,7 +11,6 @@ import javax.validation.constraints.*;
 
 import java.time.LocalDate;
 import java.util.HashSet;
-import java.util.Objects;
 import java.util.Set;
 
 
@@ -21,6 +20,7 @@ import java.util.Set;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@ToString
 //@Table(uniqueConstraints = { @UniqueConstraint(columnNames = {"email" }) })
 public class Player {
 
@@ -135,58 +135,34 @@ public class Player {
         this.fat = fat;
     }
 
+    /**
+     * Set weight and recalculate imc
+     * @param weight weight
+     */
     public void setWeight(Integer weight) {
 
         this.weight = weight;
-        // ante un cambio del peso se recalcula el imc
-        calculateImc();
-    }
-
-    public void setHigh(Integer high) {
-
-        this.high = high;
-        // ante un cambio del peso se recalcula el imc
         calculateImc();
     }
 
     /**
-     * Calculate the imc from weight and height
+     * Set high and recalculate imc
+     * @param high high
+     */
+    public void setHigh(Integer high) {
+
+        this.high = high;
+        calculateImc();
+    }
+
+    /**
+     * Calculate the imc based on weight and height
      */
     private void calculateImc() {
-        if (this.weight != null && this.high != null && this.weight != 0) {
+        try {
             this.imc = this.weight / (this.high * this.high * 10.0);
-        } else {
+        } catch (Exception ex){
             this.imc = 0.0;
         }
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Player)) return false;
-        Player player = (Player) o;
-        return Objects.equals(getFirstname(), player.getFirstname()) && Objects.equals(getLastname(), player.getLastname()) && Objects.equals(getEmail(), player.getEmail()) && Objects.equals(getBirthdate(), player.getBirthdate());
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(getFirstname(), getLastname(), getEmail(), getBirthdate());
-    }
-
-    @Override
-    public String toString() {
-        return "Player{" +
-                "id=" + id +
-                ", firstname='" + firstname + '\'' +
-                ", lastname='" + lastname + '\'' +
-                ", email='" + email + '\'' +
-                ", birthdate=" + birthdate +
-                ", position='" + position + '\'' +
-                ", gender=" + gender +
-                ", weight=" + weight +
-                ", high=" + high +
-                ", imc=" + imc +
-                ", fat=" + fat +
-                '}';
     }
 }
