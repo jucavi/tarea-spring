@@ -9,7 +9,6 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ApplicationContext;
 
-import javax.naming.Context;
 import java.time.LocalDate;
 import java.util.*;
 
@@ -34,7 +33,7 @@ public class TareaSpringApplication {
 		System.out.println("Número de jugadores en la base de datos: " + playerRep.findAll().size());
 
 		// Crear un equipo y almacenar
-		Team team = new Team(null, "team", "teamemail@email.es", since, "Santander");
+		Team team = new Team(null, "team", "teamemail@email.es", since, "Santander", null);
 		System.out.println("Número de equipos en la base de datos: " + teamRep.findAll().size());
 		teamRep.save(team);
 		System.out.println("Número de equipos en la base de datos: " + teamRep.findAll().size());

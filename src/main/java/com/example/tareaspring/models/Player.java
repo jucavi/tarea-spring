@@ -14,14 +14,12 @@ import java.util.HashSet;
 import java.util.Set;
 
 
-@Entity
 @Getter
 @Setter
-@Builder
-@NoArgsConstructor
 @AllArgsConstructor
-@ToString
-//@Table(uniqueConstraints = { @UniqueConstraint(columnNames = {"email" }) })
+@NoArgsConstructor
+@Builder
+@Entity
 public class Player {
 
     @Id
@@ -164,5 +162,22 @@ public class Player {
         } catch (Exception ex){
             this.imc = 0.0;
         }
+    }
+
+    @Override
+    public String toString() {
+        return "Player{" +
+                "id=" + id +
+                ", firstname='" + firstname + '\'' +
+                ", lastname='" + lastname + '\'' +
+                ", email='" + email + '\'' +
+                ", birthdate=" + birthdate +
+                ", position=" + position +
+                ", gender=" + gender +
+                ", weight=" + weight +
+                ", high=" + high +
+                ", imc=" + imc +
+                ", fat=" + fat +
+                '}';
     }
 }

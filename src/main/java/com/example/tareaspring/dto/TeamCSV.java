@@ -7,10 +7,12 @@ import lombok.*;
 
 import java.time.LocalDate;
 
-@Setter
 @Getter
-@NoArgsConstructor
+@Setter
 @ToString
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
 public class TeamCSV {
 
     @CsvBindByName(required = true)
@@ -34,11 +36,12 @@ public class TeamCSV {
      * @return Team instance
      */
     public Team toBeanWithId() {
-        return new Team(
-                this.id,
-                this.name,
-                this.email,
-                this.since,
-                this.city);
+        return Team.builder()
+                .id(this.id)
+                .name(this.name)
+                .email(this.email)
+                .since(this.since)
+                .city(this.city)
+                .build();
     }
 }

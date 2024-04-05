@@ -14,13 +14,12 @@ import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
 
-@Entity
-@Setter
 @Getter
-@Builder
-@NoArgsConstructor
+@Setter
 @AllArgsConstructor
-@ToString
+@NoArgsConstructor
+@Builder
+@Entity
 public class Team {
 
     @Id
@@ -48,4 +47,15 @@ public class Team {
     @JsonIgnore
     @OneToMany(mappedBy = "team", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
     Set<Signing> signingSet = new HashSet<>();
+
+    @Override
+    public String toString() {
+        return "Team{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", email='" + email + '\'' +
+                ", since=" + since +
+                ", city='" + city + '\'' +
+                '}';
+    }
 }

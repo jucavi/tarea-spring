@@ -11,12 +11,12 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
 
-@Entity
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
 @Getter
 @Setter
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
+@Entity
 @DateRange(before = "since", after = "until", message = "'since' date should be before than 'until' date")
 public class Signing {
 
