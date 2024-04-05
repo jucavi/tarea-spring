@@ -2,6 +2,7 @@ package com.example.tareaspring.models;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -19,6 +20,7 @@ import java.util.Set;
 @Entity
 @Getter
 @Setter
+@Builder
 //@Table(uniqueConstraints = { @UniqueConstraint(columnNames = {"email" }) })
 public class Player {
 
@@ -55,14 +57,14 @@ public class Player {
     private Gender gender;
 
     @NotNull
-    @Min(value = 0, message = "Weight must be greater than 0 Kilograms")
-    @Max(value = 300, message = "Weight must be lesser than 300 Kilograms")
+    @Min(value = 0, message = "Weight should be greater than 0 Kilograms")
+    @Max(value = 300, message = "Weight should be lesser than 300 Kilograms")
     @Column(nullable = false)
     private Integer weight;
 
     @NotNull
-    @Min(value = 0, message = "High must be greater than 0 centimeters")
-    @Max(value = 300, message = "High must be lesser than 300 centimeters")
+    @Min(value = 0, message = "High should be greater than 0 centimeters")
+    @Max(value = 300, message = "High should be lesser than 300 centimeters")
     @Column(nullable = false)
     private Integer high;
 
@@ -73,8 +75,8 @@ public class Player {
 
     @Setter
     @NotNull
-    @Min(value = 3, message = "Fat must be greater than 3 percent")
-    @Max(value = 40, message = "Fat must be lesser than 40 percent")
+    @Min(value = 3, message = "Fat should be greater than 3 percent")
+    @Max(value = 40, message = "Fat should be lesser than 40 percent")
     @Column(nullable = false)
     private Integer fat;
 
