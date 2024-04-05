@@ -1,19 +1,24 @@
 package com.example.tareaspring.models;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.Getter;
+import lombok.Setter;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.lang.NonNull;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Pattern;
+import javax.validation.constraints.*;
 
 import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
+
 @Entity
+@Getter
+@Setter
 //@Table(uniqueConstraints = { @UniqueConstraint(columnNames = {"email" }) })
 public class Player {
 
@@ -21,12 +26,12 @@ public class Player {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank(message = "Firstname can't be empty")
+    @NotBlank(message = "Player firstname can't be empty")
     @Column(nullable = false)
     private String firstname;
 
     @Column(nullable = false)
-    @NotBlank(message = "Lastname can't be empty")
+    @NotBlank(message = "Player lastname can't be empty")
     private String lastname;
 
     @Column(unique = true, nullable = false)
@@ -34,35 +39,46 @@ public class Player {
     private String email;
 
     @NotNull
+    //@DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+    //@JsonFormat(pattern = "yyyy-MM-dd")
     @Column(nullable = false)
     private LocalDate birthdate;
 
-    @NotNull(message = "Position can't be null")
+    //@NotNull(message = "Position can't be null")
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private FieldPosition position;
 
-    @NotNull(message = "Gender can't be null")
+    //@NotNull(message = "Gender can't be null")
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private Gender gender;
 
     @NotNull
+    @DecimalMin(value = "0", message = "Weight must be greater than 0 Kilograms")
+    @DecimalMax(value = "300", message = "Weight must be lesser than 300 Kilograms")
     @Column(nullable = false)
     private Double weight;
 
     @NotNull
+    @DecimalMin(value = "0", message = "High must be greater than 0 meters")
+    @DecimalMax(value = "2", message = "High must be lesser than 2 meters")
     @Column(nullable = false)
     private Double high;
 
+    @Setter
     @NotNull
     @Column(nullable = false)
     private Double imc;
 
+    @Setter
     @NotNull
+    @DecimalMin(value = "3", message = "Fat must be greater than 3 percent")
+    @DecimalMax(value = "40", message = "Fat must be lesser than 40 percent")
     @Column(nullable = false)
     private Double fat;
 
+    @Setter
     @JsonIgnore
     @OneToMany(mappedBy = "player", fetch = FetchType.EAGER, cascade = CascadeType.REMOVE)
     Set<Signing> signingSet = new HashSet<>();
@@ -101,33 +117,6 @@ public class Player {
             @NonNull String lastname,
             @NonNull String email,
             @NonNull LocalDate birthdate,
-            @NonNull String position,
-            @NonNull String gender,
-            @NonNull Double weight,
-            @NonNull Double high,
-            @NonNull Double fat) {
-        this.id = id;
-        this.firstname = firstname;
-        this.lastname = lastname;
-        this.email = email;
-        this.birthdate = birthdate;
-        // raise IllegalArgumentException
-        this.position = FieldPosition.valueOf(position);
-        // raise IllegalArgumentException
-        this.gender = Gender.valueOf(gender);
-        this.weight = weight;
-        this.high = high;
-        // No se si fat es calculable desde imc
-        this.fat = fat;
-        calculateImc();
-    }
-
-    public Player(
-            Long id,
-            @NonNull String firstname,
-            @NonNull String lastname,
-            @NonNull String email,
-            @NonNull LocalDate birthdate,
             @NonNull FieldPosition position,
             @NonNull Gender gender,
             @NonNull Double weight,
@@ -147,66 +136,6 @@ public class Player {
         this.fat = fat;
     }
 
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getFirstname() {
-        return firstname;
-    }
-
-    public void setFirstname(String firstname) {
-        this.firstname = firstname;
-    }
-
-    public String getLastname() {
-        return lastname;
-    }
-
-    public void setLastname(String lastname) {
-        this.lastname = lastname;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public LocalDate getBirthdate() {
-        return birthdate;
-    }
-
-    public void setBirthdate(LocalDate birthdate) {
-        this.birthdate = birthdate;
-    }
-
-    public FieldPosition getPosition() {
-        return position;
-    }
-
-    public void setPosition(FieldPosition position) {
-        this.position = position;
-    }
-
-    public Gender getGender() {
-        return gender;
-    }
-
-    public void setGender(Gender gender) {
-        this.gender = gender;
-    }
-
-    public Double getWeight() {
-        return weight;
-    }
-
     public void setWeight(Double weight) {
 
         this.weight = weight;
@@ -214,39 +143,11 @@ public class Player {
         calculateImc();
     }
 
-    public Double getHigh() {
-        return high;
-    }
-
     public void setHigh(Double high) {
 
         this.high = high;
         // ante un cambio del peso se recalcula el imc
         calculateImc();
-    }
-
-    public Double getImc() {
-        return imc;
-    }
-
-    public void setImc(Double imc) {
-        this.imc = imc;
-    }
-
-    public Double getFat() {
-        return fat;
-    }
-
-    public void setFat(Double fat) {
-        this.fat = fat;
-    }
-
-    public Set<Signing> getSigningSet() {
-        return signingSet;
-    }
-
-    public void setSigningSet(Set<Signing> signingSet) {
-        this.signingSet = signingSet;
     }
 
     /**
@@ -265,10 +166,7 @@ public class Player {
         if (this == o) return true;
         if (!(o instanceof Player)) return false;
         Player player = (Player) o;
-        return Objects.equals(getFirstname(), player.getFirstname())
-                && Objects.equals(getLastname(), player.getLastname())
-                && Objects.equals(getEmail(), player.getEmail())
-                && Objects.equals(getBirthdate(), player.getBirthdate());
+        return Objects.equals(getFirstname(), player.getFirstname()) && Objects.equals(getLastname(), player.getLastname()) && Objects.equals(getEmail(), player.getEmail()) && Objects.equals(getBirthdate(), player.getBirthdate());
     }
 
     @Override
