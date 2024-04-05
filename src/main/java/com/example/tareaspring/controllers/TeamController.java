@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @RestController
@@ -51,7 +52,7 @@ public class TeamController {
      * @return team if created, otherwise {@code 404 } not found
      */
     @PostMapping("/teams")
-    public ResponseEntity<Team> create(@RequestBody Team team) {
+    public ResponseEntity<Team> create(@RequestBody @Valid Team team) {
         Team result = service.create(team);
 
         return ResponseEntity.ok(result);
@@ -63,7 +64,7 @@ public class TeamController {
      * @return team if updated, otherwise {@code 404 } not found
      */
     @PutMapping("/teams")
-    public ResponseEntity<Team> update(@RequestBody Team team) {
+    public ResponseEntity<Team> update(@RequestBody @Valid Team team) {
         Team result = service.update(team);
 
         if (result != null) {

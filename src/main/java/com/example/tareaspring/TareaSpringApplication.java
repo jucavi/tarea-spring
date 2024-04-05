@@ -28,7 +28,7 @@ public class TareaSpringApplication {
 
 
 		// crear un jugador y almacenar
-		Player player = new Player(null, "player", "one", "email@email.es", since, FieldPosition.Defensa, Gender.Mujer, 67.9, 1.78, 0.7);
+		Player player = new Player(null, "player", "one", "email@email.es", since, FieldPosition.Defensa, Gender.Mujer, 67.9, 1.78, 5.7);
 		System.out.println("Número de jugadores en la base de datos: " + playerRep.findAll().size());
 		playerRep.save(player);
 		System.out.println("Número de jugadores en la base de datos: " + playerRep.findAll().size());

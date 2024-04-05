@@ -20,21 +20,31 @@ public class SigningCSV {
 
     @CsvBindByName(required = true)
     private Long id;
+
     @CsvBindByName(required = true, column = "playerId")
     Long playerId;
+
     @CsvBindByName(required = true, column = "teamId")
     Long teamId;
+
     @CsvBindByName(required = true)
     @CsvDate(value = "yyyy-MM-dd")
     private LocalDate since;
+
     @CsvBindByName(required = true)
     @CsvDate(value = "yyyy-MM-dd")
     private LocalDate until;
+
     @CsvBindByName
     private Integer squadNumber;
 
+    /**
+     * Returns an instance of Signing
+     * @return Team instance
+     */
     public Signing toBeanWithId() {
 
+        // TODO: BUILDER
         Player player = new Player();
         Team team = new Team();
 

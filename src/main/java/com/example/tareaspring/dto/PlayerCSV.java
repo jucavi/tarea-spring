@@ -1,5 +1,7 @@
 package com.example.tareaspring.dto;
 
+import com.example.tareaspring.models.FieldPosition;
+import com.example.tareaspring.models.Gender;
 import com.example.tareaspring.models.Player;
 import com.opencsv.bean.CsvBindByName;
 import com.opencsv.bean.CsvDate;
@@ -18,30 +20,40 @@ public class PlayerCSV {
 
     @CsvBindByName(required = true)
     private Long id;
+
     @CsvBindByName(required = true)
     private String firstname;
+
     @CsvBindByName(required = true)
     private String lastname;
+
     @CsvBindByName(required = true)
     private String email;
+
     @CsvBindByName(required = true)
     @CsvDate(value = "yyyy-MM-dd")
     private LocalDate birthdate;
+
     @CsvBindByName(required = true)
     private String position;
+
     @CsvBindByName(required = true)
     private String gender;
+
     @CsvBindByName(required = true)
     private Double weight;
+
     @CsvBindByName(required = true)
     private Double high;
+
     @CsvBindByName(required = true)
     private Double imc;
+
     @CsvBindByName(required = true)
     private Double fat;
 
     /**
-     * Returns an instance of Team
+     * Returns an instance of Player
      * @return Team instance
      */
     public Player toBeanWithId() {
@@ -52,8 +64,8 @@ public class PlayerCSV {
                 this.lastname,
                 this.email,
                 this.birthdate,
-                this.position,
-                this.gender,
+                FieldPosition.valueOf(this.position),
+                Gender.valueOf(this.gender),
                 this.weight,
                 this.high,
                 this.fat
