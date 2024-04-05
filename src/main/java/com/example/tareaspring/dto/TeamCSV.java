@@ -15,13 +15,17 @@ public class TeamCSV {
 
     @CsvBindByName(required = true)
     private Long id;
+
     @CsvBindByName(required = true)
     private String name;
+
     @CsvBindByName(required = true)
     private String email;
+
     @CsvBindByName(required = true)
     @CsvDate(value = "yyyy-MM-dd")
     private LocalDate since;
+    
     @CsvBindByName(required = true)
     private String city;
 

@@ -5,6 +5,7 @@ import com.example.tareaspring.models.Player;
 import com.example.tareaspring.models.Signing;
 import com.example.tareaspring.models.Team;
 import com.example.tareaspring.repositories.SigningRepository;
+import com.example.tareaspring.utils.parsers.CSVParser;
 import com.opencsv.bean.CsvToBean;
 import com.opencsv.bean.CsvToBeanBuilder;
 import lombok.extern.log4j.Log4j2;
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.time.LocalDate;
@@ -140,13 +142,12 @@ public class SigningServiceImp implements SigningService {
 
         List<Signing> signings = new ArrayList<>();
 
-        // validamos que el fichero existe
         if (file.isEmpty()) {
-            log.warn("Not CSV file present to upload");
+            log.warn("CSV file needed");
             return signings;
         }
 
-        // parsemos el fichero CSV a una lista de objetos Signing
+        // getting Signing list from csv
         try (Reader reader = new BufferedReader(new InputStreamReader(file.getInputStream()))) {
             CsvToBean<SigningCSV> csvToBean = new CsvToBeanBuilder(reader)
                     .withIgnoreLeadingWhiteSpace(true)
@@ -169,6 +170,27 @@ public class SigningServiceImp implements SigningService {
         } catch (Exception ex) {
             log.error("An error occurred while processing the CSV file.");
         }
+
+        /*
+        try {
+            List<SigningCSV> result = CSVParser.parseToBeanList(file, Signing.class);
+
+            result.forEach(signingCSV -> {
+                System.out.println("------------ parse -------------- ");
+                Signing signing = signingCSV.toBeanWithId();
+                try {
+                    repository.save(signing);
+                    signings.add(signing);
+
+                } catch (Exception ex) {
+                    log.error("{} can't be saved: {}", signing, ex.getMessage());
+                }
+            });
+
+        } catch (IOException e) {
+            log.error("An error occurred while processing the CSV file.");
+        }
+        */
 
         return signings;
     }

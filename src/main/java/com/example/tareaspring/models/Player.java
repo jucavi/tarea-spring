@@ -55,16 +55,16 @@ public class Player {
     private Gender gender;
 
     @NotNull
-    @DecimalMin(value = "0", message = "Weight must be greater than 0 Kilograms")
-    @DecimalMax(value = "300", message = "Weight must be lesser than 300 Kilograms")
+    @Min(value = 0, message = "Weight must be greater than 0 Kilograms")
+    @Max(value = 300, message = "Weight must be lesser than 300 Kilograms")
     @Column(nullable = false)
-    private Double weight;
+    private Integer weight;
 
     @NotNull
-    @DecimalMin(value = "0", message = "High must be greater than 0 meters")
-    @DecimalMax(value = "2", message = "High must be lesser than 2 meters")
+    @Min(value = 0, message = "High must be greater than 0 centimeters")
+    @Max(value = 300, message = "High must be lesser than 300 centimeters")
     @Column(nullable = false)
-    private Double high;
+    private Integer high;
 
     @Setter
     @NotNull
@@ -73,10 +73,10 @@ public class Player {
 
     @Setter
     @NotNull
-    @DecimalMin(value = "3", message = "Fat must be greater than 3 percent")
-    @DecimalMax(value = "40", message = "Fat must be lesser than 40 percent")
+    @Min(value = 3, message = "Fat must be greater than 3 percent")
+    @Max(value = 40, message = "Fat must be lesser than 40 percent")
     @Column(nullable = false)
-    private Double fat;
+    private Integer fat;
 
     @Setter
     @JsonIgnore
@@ -94,9 +94,9 @@ public class Player {
             @NonNull LocalDate birthdate,
             @NonNull FieldPosition position,
             @NonNull Gender gender,
-            @NonNull Double weight,
-            @NonNull Double high,
-            @NonNull Double fat) {
+            @NonNull Integer weight,
+            @NonNull Integer high,
+            @NonNull Integer fat) {
         this.id = id;
         this.firstname = firstname;
         this.lastname = lastname;
@@ -106,8 +106,7 @@ public class Player {
         this.gender = gender;
         this.weight = weight;
         this.high = high;
-        this.imc = weight / (high * high);
-        // No se si fat es calculable a partir del imc
+        this.imc = weight / (high * high * 1.0);
         this.fat = fat;
     }
 
@@ -119,10 +118,10 @@ public class Player {
             @NonNull LocalDate birthdate,
             @NonNull FieldPosition position,
             @NonNull Gender gender,
-            @NonNull Double weight,
-            @NonNull Double high,
+            @NonNull Integer weight,
+            @NonNull Integer high,
             @NonNull Double imc,
-            @NonNull Double fat) {
+            @NonNull Integer fat) {
         this.id = id;
         this.firstname = firstname;
         this.lastname = lastname;
@@ -136,14 +135,14 @@ public class Player {
         this.fat = fat;
     }
 
-    public void setWeight(Double weight) {
+    public void setWeight(Integer weight) {
 
         this.weight = weight;
         // ante un cambio del peso se recalcula el imc
         calculateImc();
     }
 
-    public void setHigh(Double high) {
+    public void setHigh(Integer high) {
 
         this.high = high;
         // ante un cambio del peso se recalcula el imc
@@ -155,7 +154,7 @@ public class Player {
      */
     private void calculateImc() {
         if (this.weight != null && this.high != null && this.weight != 0) {
-            this.imc = this.weight / (this.high * this.high);
+            this.imc = this.weight / (this.high * this.high * 10.0);
         } else {
             this.imc = 0.0;
         }

@@ -39,11 +39,7 @@ public class TeamController {
     public ResponseEntity<Team> findById(@PathVariable Long id) {
         Team result = service.findById(id);
 
-        if (result != null) {
-            return ResponseEntity.ok(result);
-        }
-
-        return ResponseEntity.notFound().build();
+        return ResponseEntity.ok(result);
     }
 
     /**

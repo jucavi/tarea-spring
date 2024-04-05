@@ -41,16 +41,16 @@ public class PlayerCSV {
     private String gender;
 
     @CsvBindByName(required = true)
-    private Double weight;
+    private Integer weight;
 
     @CsvBindByName(required = true)
-    private Double high;
+    private Integer high;
 
     @CsvBindByName(required = true)
     private Double imc;
 
     @CsvBindByName(required = true)
-    private Double fat;
+    private Integer fat;
 
     /**
      * Returns an instance of Player
