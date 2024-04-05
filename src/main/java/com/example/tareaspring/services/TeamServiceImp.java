@@ -3,10 +3,8 @@ package com.example.tareaspring.services;
 import com.example.tareaspring.models.Team;
 import com.example.tareaspring.dto.TeamCSV;
 import com.example.tareaspring.repositories.TeamRepository;
-import com.opencsv.bean.BeanVerifier;
 import com.opencsv.bean.CsvToBean;
 import com.opencsv.bean.CsvToBeanBuilder;
-import com.opencsv.exceptions.CsvConstraintViolationException;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
@@ -43,20 +41,9 @@ public class TeamServiceImp implements TeamService {
 
         // parsemos el fichero CSV a una lista de objetos Team
         try (Reader reader = new BufferedReader(new InputStreamReader(file.getInputStream()))) {
-            CsvToBean<TeamCSV> csvToBean = new CsvToBeanBuilder(reader)
+            CsvToBean<TeamCSV> csvToBean = new CsvToBeanBuilder<TeamCSV>(reader)
                     .withType(TeamCSV.class)
                     .withIgnoreLeadingWhiteSpace(true)
-                    .withVerifier(new BeanVerifier() {
-                        @Override
-                        public boolean verifyBean(Object bean) throws CsvConstraintViolationException {
-                            TeamCSV b = (TeamCSV) bean;
-                            // Todas propiedades nulas
-                            if (b == null) {
-                                return false;
-                            }
-                            return true;
-                        }
-                    })
                     .build();
 
             List<TeamCSV> teamsObj = csvToBean.parse();

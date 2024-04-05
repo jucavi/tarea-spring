@@ -5,7 +5,6 @@ import com.example.tareaspring.models.Player;
 import com.example.tareaspring.models.Signing;
 import com.example.tareaspring.models.Team;
 import com.example.tareaspring.repositories.SigningRepository;
-import com.example.tareaspring.utils.parsers.CSVParser;
 import com.opencsv.bean.CsvToBean;
 import com.opencsv.bean.CsvToBeanBuilder;
 import lombok.extern.log4j.Log4j2;
@@ -14,7 +13,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.time.LocalDate;
@@ -149,7 +147,7 @@ public class SigningServiceImp implements SigningService {
 
         // getting Signing list from csv
         try (Reader reader = new BufferedReader(new InputStreamReader(file.getInputStream()))) {
-            CsvToBean<SigningCSV> csvToBean = new CsvToBeanBuilder(reader)
+            CsvToBean<SigningCSV> csvToBean = new CsvToBeanBuilder<SigningCSV>(reader)
                     .withIgnoreLeadingWhiteSpace(true)
                     .withType(SigningCSV.class)
                     .build();
@@ -260,7 +258,7 @@ public class SigningServiceImp implements SigningService {
         LocalDate today = LocalDate.now();
         LocalDate until = signing.getUntil();
 
-        // signing expiration must be after current date
+        // signing expiration should be after current date
         // inclusive signing ending? if true || until.isEqual(today)
         return until == null || until.isAfter(today);
     }
