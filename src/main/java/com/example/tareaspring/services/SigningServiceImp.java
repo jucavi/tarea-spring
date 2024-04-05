@@ -290,10 +290,4 @@ public class SigningServiceImp implements SigningService {
         log.warn("Trying to delete a Signing with wrong ID");
         return false;
     }
-
-    /*
-     TODO: Validate Entity
-        since > until
-        squadNumber [0-99]
-     */
 }

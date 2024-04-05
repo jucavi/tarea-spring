@@ -44,17 +44,10 @@ public class SigningCSV {
      */
     public Signing toBeanWithId() {
 
-        // TODO: BUILDER
-        Player player = new Player();
-        Team team = new Team();
-
-        player.setId(this.playerId);
-        team.setId(this.teamId);
-
         return new Signing(
              this.id,
-             player,
-             team,
+             Player.builder().id(this.teamId).build(),
+             Team.builder().id(this.teamId).build(),
              this.since,
              this.until,
              this.squadNumber
