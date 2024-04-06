@@ -25,12 +25,12 @@ public class Signing {
     private Long id;
 
     @NotNull
-    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.REMOVE)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "player_id", referencedColumnName = "id")
     Player player;
 
     @NotNull
-    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.REMOVE)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "team_id", referencedColumnName = "id")
     Team team;
 

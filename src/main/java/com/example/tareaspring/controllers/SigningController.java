@@ -1,6 +1,5 @@
 package com.example.tareaspring.controllers;
 
-import com.example.tareaspring.models.Player;
 import com.example.tareaspring.models.Signing;
 import com.example.tareaspring.services.SigningServiceImp;
 import org.springframework.http.ResponseEntity;
@@ -69,6 +68,22 @@ public class SigningController {
     @PutMapping
     public ResponseEntity<Signing> update(@RequestBody @Valid  Signing signing) {
         throw new RuntimeException("not implemented yet");
+    }
+
+    /**
+     * Delete a signing from a database
+     * @param id signing identifier
+     * @return {@code true} if a signing was deleted, {@code 404 } not found
+     */
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Boolean> delete(@PathVariable Long id) {
+        Boolean result = service.deleteById(id);
+
+        if (result) {
+            return ResponseEntity.ok(true);
+        }
+
+        return ResponseEntity.notFound().build();
     }
 
     /**

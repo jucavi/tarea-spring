@@ -55,27 +55,21 @@ public class PlayerServiceImp implements PlayerService {
 
     @Override
     public List<Player> findAll() {
-        log.info("Retrieving all Teams from database");
+        log.info("Retrieving all players from database");
         return repository.findAll();
     }
 
     @Override
-    public Player findById(Long id) {
-        Optional<Player> playerOpt = repository.findById(id);
-
-        if (playerOpt.isPresent()) {
-            log.info("Retrieving Player with ID: {}", id);
-            return playerOpt.get();
-        }
-        log.warn("Retrieving Player with wrong ID: {}", id);
-        return null;
+    public Optional<Player> findById(Long id) {
+        log.info("Retrieving player with ID: {}", id);
+        return repository.findById(id);
     }
 
     @Override
     public Player create(Player player) {
 
         if (player.getId() != null) {
-            log.warn("Trying to create a Player with assigned ID: {}", player.getId());
+            log.warn("Trying to create a player with assigned ID: {}", player.getId());
             return null;
         }
 
@@ -89,7 +83,7 @@ public class PlayerServiceImp implements PlayerService {
     public Player update(Player player) {
 
         if (player.getId() != null && !repository.existsById(player.getId())) {
-            log.warn("Trying to update a Player with wrong ID");
+            log.warn("Trying to update a player with wrong ID");
             return null;
         }
 
@@ -104,7 +98,7 @@ public class PlayerServiceImp implements PlayerService {
 
         if (repository.existsById(id)) {
             repository.deleteById(id);
-            log.info("Player deleted with ID: {}", id);
+            log.info("Player deleted");
             return true;
         }
 

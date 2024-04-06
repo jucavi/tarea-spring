@@ -1,6 +1,7 @@
 package com.example.tareaspring.controllers;
 
 import com.example.tareaspring.models.Player;
+import com.example.tareaspring.models.Signing;
 import com.example.tareaspring.services.PlayerServiceImp;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -8,6 +9,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
 import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/api/v1/players")
@@ -36,11 +39,24 @@ public class PlayerController {
      */
     @GetMapping("/{id}")
     public ResponseEntity<Player> findById(@PathVariable Long id) {
-        Player result = service.findById(id);
+        Optional<Player> result = service.findById(id);
 
-        if (result != null) {
-            return ResponseEntity.ok(result);
-        }
+        return result.map(ResponseEntity::ok).orElseThrow(RuntimeException::new);
+    }
+
+    /**
+     * Find signing of a player  from database
+     * @param id player identifier
+     * @return list of signings, otherwise {@code 404 } not found
+     */
+    @GetMapping("/{id}/signings")
+    public ResponseEntity<Set<Signing>> findSigningsByPlayerId(@PathVariable Long id) {
+
+//        Player result = service.findById(id);
+//
+//        if (result != null) {
+//            return ResponseEntity.ok(result);
+//        }
 
         return ResponseEntity.notFound().build();
     }

@@ -1,5 +1,6 @@
 package com.example.tareaspring.models;
 
+import com.example.tareaspring.utils.validators.ValueOfEnum;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
@@ -35,7 +36,8 @@ public class Player {
     private String lastname;
 
     @Column(unique = true, nullable = false)
-    @Pattern(regexp = "^[a-zA-Z0-9_!#$%&'*+=?`{|}~^.-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{1,4}$", message = "Invalid email")
+//    @Email(message = "Email address must be valid") // not check blank
+    @Pattern(regexp = "^[a-zA-Z0-9_!#$%&'*+=?`{|}~^.-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{1,4}$", message = "Email address must be valid")
     private String email;
 
     @NotNull
@@ -47,11 +49,13 @@ public class Player {
     //@NotNull(message = "Position can't be null")
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
+    @ValueOfEnum(enumClass = FieldPosition.class, message = "Position not allowed")
     private FieldPosition position;
 
     //@NotNull(message = "Gender can't be null")
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
+    @ValueOfEnum(enumClass = Gender.class, message = "Gender not allowed")
     private Gender gender;
 
     @NotNull
