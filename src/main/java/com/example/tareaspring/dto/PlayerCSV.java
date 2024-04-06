@@ -16,7 +16,7 @@ import java.time.LocalDate;
 @Getter
 @NoArgsConstructor
 @ToString
-public class PlayerCSV {
+public class PlayerCSV implements CsvDtoInterface<Player> {
 
     @CsvBindByName(required = true)
     private Long id;
@@ -52,12 +52,8 @@ public class PlayerCSV {
     @CsvBindByName(required = true)
     private Integer fat;
 
-    /**
-     * Returns an instance of Player
-     * @return Team instance
-     */
-    public Player toBeanWithId() {
-        // TODO: Check for nulls if file not match with Object properties
+    @Override
+    public Player mapToDao() {
         return new Player(
                 this.id,
                 this.firstname,

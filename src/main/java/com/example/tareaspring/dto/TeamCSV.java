@@ -13,7 +13,7 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class TeamCSV {
+public class TeamCSV implements CsvDtoInterface<Team> {
 
     @CsvBindByName(required = true)
     private Long id;
@@ -31,11 +31,8 @@ public class TeamCSV {
     @CsvBindByName(required = true)
     private String city;
 
-    /**
-     * Returns an instance of Team
-     * @return Team instance
-     */
-    public Team toBeanWithId() {
+    @Override
+    public Team mapToDao() {
         return Team.builder()
                 .id(this.id)
                 .name(this.name)

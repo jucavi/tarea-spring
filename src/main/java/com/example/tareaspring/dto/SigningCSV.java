@@ -16,7 +16,7 @@ import java.time.LocalDate;
 @Getter
 @NoArgsConstructor
 @ToString
-public class SigningCSV {
+public class SigningCSV implements CsvDtoInterface<Signing> {
 
     @CsvBindByName(required = true)
     private Long id;
@@ -38,11 +38,8 @@ public class SigningCSV {
     @CsvBindByName
     private Integer squadNumber;
 
-    /**
-     * Returns an instance of Signing
-     * @return Team instance
-     */
-    public Signing toBeanWithId() {
+    @Override
+    public Signing mapToDao() {
 
         return new Signing(
              this.id,
