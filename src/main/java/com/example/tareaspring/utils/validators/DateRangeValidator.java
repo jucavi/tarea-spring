@@ -9,6 +9,7 @@ public class DateRangeValidator implements ConstraintValidator<DateRange, Object
     private String beforeFieldName;
     private String afterFieldName;
 
+
     @Override
     public void initialize(DateRange constraintAnnotation) {
         beforeFieldName = constraintAnnotation.before();
@@ -26,6 +27,7 @@ public class DateRangeValidator implements ConstraintValidator<DateRange, Object
 
             final LocalDate beforeDate = (LocalDate) beforeDateField.get(value);
             final LocalDate afterDate = (LocalDate) afterDateField.get(value);
+
             return beforeDate.isBefore(afterDate);
 
         } catch (NoSuchFieldException | IllegalAccessException ignored) {

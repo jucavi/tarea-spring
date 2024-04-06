@@ -17,7 +17,7 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @Builder
 @Entity
-@DateRange(before = "since", after = "until", message = "'since' date should be before than 'until' date")
+@DateRange(before = "since", after = "until", message = "Until date must be greater then since date")
 public class Signing {
 
     @Id
@@ -25,12 +25,12 @@ public class Signing {
     private Long id;
 
     @NotNull
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.REMOVE)
     @JoinColumn(name = "player_id", referencedColumnName = "id")
     Player player;
 
     @NotNull
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.REMOVE)
     @JoinColumn(name = "team_id", referencedColumnName = "id")
     Team team;
 

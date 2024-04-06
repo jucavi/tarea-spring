@@ -9,7 +9,7 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 public @interface DateRange {
-    String message() default "{mob.concept.admin.models.constraint.DateRange.message}";
+    String message() default "Validation error";
 
     Class<?>[] groups() default {};
 

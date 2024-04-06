@@ -7,7 +7,6 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import org.springframework.web.context.request.WebRequest;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -18,7 +17,7 @@ import java.util.*;
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<Map<String, Object>> handleMethodArgumentException(MethodArgumentNotValidException ex, WebRequest request) {
+    public ResponseEntity<Map<String, Object>> handleMethodArgumentException(MethodArgumentNotValidException ex) {
 
         log.error(ex.getMessage());
 
@@ -26,12 +25,19 @@ public class GlobalExceptionHandler {
         Map<String, Object> body = new HashMap<>();
 
         body.put("timestamp", LocalDateTime.now());
-        body.put("status", HttpStatus.UNPROCESSABLE_ENTITY.value());
+        body.put("reason", HttpStatus.UNPROCESSABLE_ENTITY.getReasonPhrase());
+        body.put("code", HttpStatus.UNPROCESSABLE_ENTITY.value());
 
         ex.getBindingResult().getAllErrors().forEach(error -> {
-            String field = ((FieldError) error).getField();
             String message = error.getDefaultMessage();
-            errors.put(field, message);
+
+            try {
+                String field = ((FieldError) error).getField();
+                errors.put(field, message);
+            } catch (Exception e) {
+                String field = error.getObjectName();
+                errors.put(field, message);
+            }
         });
 
         body.put("errors", errors);
@@ -39,8 +45,8 @@ public class GlobalExceptionHandler {
         return ResponseEntity.unprocessableEntity().body(body);
     }
 
-//    @ExceptionHandler(HttpMessageNotReadableException.class)
-//    public ResponseEntity<Map<String, String>> handleException(HttpMessageNotReadableException ex, WebRequest request) {
+//    @ExceptionHandler(Exception.class)
+//    public ResponseEntity<Map<String, String>> handleException(Exception ex, WebRequest request) {
 //
 //        log.error(ex.getMessage());
 //
