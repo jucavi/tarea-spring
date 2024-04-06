@@ -2,37 +2,36 @@ package com.example.tareaspring.utils.parsers;
 
 import com.opencsv.bean.CsvToBean;
 import com.opencsv.bean.CsvToBeanBuilder;
-import org.springframework.web.multipart.MultipartFile;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.Reader;
 import java.util.List;
 
+/**
+ * Parser for csv files.
+ *
+ * <pre>
+ *     Usage:
+ *          Reader reader = new BufferedReader(new InputStreamReader(csvFile.getInputStream()));
+ *          List&#60;Pojo&#62; users = CSVParser(reader, Pojo.class);
+ * </pre>
+ */
 public class CSVParser {
 
     /**
+     * Returns a List after converts CSV data to objects.
      *
-     * @param file
-     * @param klass
-     * @return
-     * @param <T>
-     * @throws IOException
+     * @param reader csv reader
+     * @param mapToClass class to be mapped
+     * @return list of objects
+     * @param <T> class to convert the objects to.
      */
-    public static <T> List<T> parseToBeanList(MultipartFile file, Class klass) throws IOException {
+    public static <T> List<T> parse(Reader reader, Class<T> mapToClass) {
 
-        List<T> result;
+        CsvToBean<T> csvToBean = new CsvToBeanBuilder<T>(reader)
+                .withIgnoreLeadingWhiteSpace(true)
+                .withType(mapToClass)
+                .build();
 
-        try (Reader reader = new BufferedReader(new InputStreamReader(file.getInputStream()))) {
-            CsvToBean<T> csvToBean = new CsvToBeanBuilder(reader)
-                    .withIgnoreLeadingWhiteSpace(true)
-                    .withType(klass)
-                    .build();
-
-            result = csvToBean.parse();
-        }
-
-        return result;
+        return csvToBean.parse();
     }
 }
