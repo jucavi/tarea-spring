@@ -41,13 +41,13 @@ public class SigningCSV implements CsvDtoInterface<Signing> {
     @Override
     public Signing mapToDao() {
 
-        return new Signing(
-             this.id,
-             Player.builder().id(this.teamId).build(),
-             Team.builder().id(this.teamId).build(),
-             this.since,
-             this.until,
-             this.squadNumber
-        );
+        return Signing.builder()
+                .id(this.id)
+                .player(Player.builder().id(this.teamId).build())
+                .team(Team.builder().id(this.teamId).build())
+                .since(this.since)
+                .until(this.until)
+                .squadNumber(this.squadNumber)
+                .build();
     }
 }

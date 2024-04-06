@@ -31,6 +31,10 @@ public class TareaSpringApplication {
 		System.out.println("Número de jugadores en la base de datos: " + playerRep.findAll().size());
 		playerRep.save(player);
 		System.out.println("Número de jugadores en la base de datos: " + playerRep.findAll().size());
+		System.out.printf("Imc: %,.6f%n", player.getImc());
+		player.setHigh(200);
+		player.setWeight(50);
+		System.out.printf("Imc: %,.6f%n", player.getImc());
 
 		// Crear un equipo y almacenar
 		Team team = new Team(null, "team", "teamemail@email.es", since, "Santander", null);

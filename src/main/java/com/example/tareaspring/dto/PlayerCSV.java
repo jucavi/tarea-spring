@@ -54,18 +54,19 @@ public class PlayerCSV implements CsvDtoInterface<Player> {
 
     @Override
     public Player mapToDao() {
-        return new Player(
-                this.id,
-                this.firstname,
-                this.lastname,
-                this.email,
-                this.birthdate,
-                FieldPosition.valueOf(this.position),
-                Gender.valueOf(this.gender),
-                this.weight,
-                this.high,
-                this.fat
-        );
+        return Player.builder()
+                .id(this.id)
+                .firstname(this.firstname)
+                .lastname(this.lastname)
+                .email(this.email)
+                .birthdate(this.birthdate)
+                .position(FieldPosition.valueOf(this.position))
+                .gender(Gender.valueOf(this.gender))
+                .imc(this.imc)
+                .weight(this.weight)
+                .high(this.high)
+                .fat(this.fat)
+                .build();
     }
 }
 
