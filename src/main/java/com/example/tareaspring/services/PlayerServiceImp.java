@@ -3,8 +3,8 @@ package com.example.tareaspring.services;
 import com.example.tareaspring.models.Player;
 import com.example.tareaspring.dto.PlayerCSV;
 import com.example.tareaspring.repositories.PlayerRepository;
-import com.opencsv.bean.CsvToBean;
-import com.opencsv.bean.CsvToBeanBuilder;
+import com.example.tareaspring.utils.parsers.CSVParser;
+
 import lombok.extern.log4j.Log4j2;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
@@ -28,43 +28,26 @@ public class PlayerServiceImp implements PlayerService {
         this.repository = repository;
     }
 
-
-    // TODO: Refactorize
     @Override
     public List<Player> parseCSVFileToPlayers(@NonNull MultipartFile file) {
 
         List<Player> players = new ArrayList<>();
-
-        // validamos que el fichero existe
-        if (file.isEmpty()) {
-            log.warn("Not CSV file present to upload");
-            return players;
-        }
-
-        // parsemos el fichero CSV a una lista de objetos Player
         try (Reader reader = new BufferedReader(new InputStreamReader(file.getInputStream()))) {
-            CsvToBean<PlayerCSV> csvToBean = new CsvToBeanBuilder<PlayerCSV>(reader)
-                    .withIgnoreLeadingWhiteSpace(true)
-                    .withType(PlayerCSV.class)
-                    .build();
 
-            List<PlayerCSV> playersObj = csvToBean.parse();
-
-            for (PlayerCSV o : playersObj) {
-                Player player = o.toBeanWithId();
+            List<PlayerCSV> result = CSVParser.parse(reader, PlayerCSV.class);
+            result.forEach((playerCsv -> {
                 try {
-                    repository.save(player);
-                    // Todo: implement to
-                    //this.create(player);
-                    players.add(player);
+                    Player player = playerCsv.mapToDao();
 
+                    repository.save(player);
+                    players.add(player);
                 } catch (Exception ex) {
-                    log.error("{} can't be saved: {}", player, ex.getMessage());
+                    log.error("{} can't be stored in the database due to: \n\t{}", playerCsv, ex.getMessage());
                 }
-            }
+            }));
 
         } catch (Exception ex) {
-            log.error("An error occurred while processing the CSV file.");
+            log.error("Unable to read csv file.");
         }
 
         return players;
@@ -128,9 +111,4 @@ public class PlayerServiceImp implements PlayerService {
         log.warn("Trying to delete a Player with wrong ID");
         return false;
     }
-
-    /*
-     TODO: Validate Entity
-        email
-     */
 }

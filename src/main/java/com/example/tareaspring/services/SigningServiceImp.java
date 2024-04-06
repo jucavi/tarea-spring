@@ -5,8 +5,8 @@ import com.example.tareaspring.models.Player;
 import com.example.tareaspring.models.Signing;
 import com.example.tareaspring.models.Team;
 import com.example.tareaspring.repositories.SigningRepository;
-import com.opencsv.bean.CsvToBean;
-import com.opencsv.bean.CsvToBeanBuilder;
+import com.example.tareaspring.utils.parsers.CSVParser;
+
 import lombok.extern.log4j.Log4j2;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
@@ -131,64 +131,30 @@ public class SigningServiceImp implements SigningService {
 
     @Override
     public Signing update(Signing Signing) {
-        return null;
+        throw new RuntimeException("Not implemented");
     }
 
-    @Override
-    // TODO: Refactorize
+
     public List<Signing> parseCSVFileToSignings(@NonNull MultipartFile file) {
 
         List<Signing> signings = new ArrayList<>();
-
-        if (file.isEmpty()) {
-            log.warn("CSV file needed");
-            return signings;
-        }
-
-        // getting Signing list from csv
         try (Reader reader = new BufferedReader(new InputStreamReader(file.getInputStream()))) {
-            CsvToBean<SigningCSV> csvToBean = new CsvToBeanBuilder<SigningCSV>(reader)
-                    .withIgnoreLeadingWhiteSpace(true)
-                    .withType(SigningCSV.class)
-                    .build();
 
-            List<SigningCSV> signingObj = csvToBean.parse();
-
-            for (SigningCSV o : signingObj) {
-                Signing signing = o.toBeanWithId();
+            List<SigningCSV> result = CSVParser.parse(reader, SigningCSV.class);
+            result.forEach((signingCsv -> {
                 try {
+                    Signing signing = signingCsv.mapToDao();
+
                     repository.save(signing);
                     signings.add(signing);
-
                 } catch (Exception ex) {
-                    log.error("{} can't be saved: {}", signing, ex.getMessage());
+                    log.error("{} can't be stored in the database due to: \n\t{}", signingCsv, ex.getMessage());
                 }
-            }
+            }));
 
         } catch (Exception ex) {
-            log.error("An error occurred while processing the CSV file.");
+            log.error("Unable to read csv file.");
         }
-
-        /*
-        try {
-            List<SigningCSV> result = CSVParser.parseToBeanList(file, Signing.class);
-
-            result.forEach(signingCSV -> {
-                System.out.println("------------ parse -------------- ");
-                Signing signing = signingCSV.toBeanWithId();
-                try {
-                    repository.save(signing);
-                    signings.add(signing);
-
-                } catch (Exception ex) {
-                    log.error("{} can't be saved: {}", signing, ex.getMessage());
-                }
-            });
-
-        } catch (IOException e) {
-            log.error("An error occurred while processing the CSV file.");
-        }
-        */
 
         return signings;
     }
@@ -205,10 +171,10 @@ public class SigningServiceImp implements SigningService {
 
         // needed because properties of those objects send in request are null
         Team team = repository.findByTeamWithId(signing.getTeam().getId());
-        Player Signing = repository.findByPlayerWithId(signing.getPlayer().getId());
+        Player player = repository.findByPlayerWithId(signing.getPlayer().getId());
 
         // fk needed, need some kind of validation in form
-        if (team == null || Signing == null) {
+        if (team == null || player == null) {
             log.warn("Trying to create a Signing with non available team or Signing");
             return false;
         }

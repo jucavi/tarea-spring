@@ -1,10 +1,9 @@
 package com.example.tareaspring.services;
 
-import com.example.tareaspring.models.Team;
 import com.example.tareaspring.dto.TeamCSV;
+import com.example.tareaspring.models.Team;
 import com.example.tareaspring.repositories.TeamRepository;
-import com.opencsv.bean.CsvToBean;
-import com.opencsv.bean.CsvToBeanBuilder;
+import com.example.tareaspring.utils.parsers.CSVParser;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
@@ -27,40 +26,26 @@ public class TeamServiceImp implements TeamService {
         this.repository = repository;
     }
 
-    // TODO: Refactorize
     @Override
     public List<Team> parseCSVFileToTeams(@NonNull MultipartFile file) {
-
+        
         List<Team> teams = new ArrayList<>();
-
-        // validamos que el fichero existe
-        if (file.isEmpty()) {
-            log.warn("Not CSV file present to upload");
-            return teams;
-        }
-
-        // parsemos el fichero CSV a una lista de objetos Team
         try (Reader reader = new BufferedReader(new InputStreamReader(file.getInputStream()))) {
-            CsvToBean<TeamCSV> csvToBean = new CsvToBeanBuilder<TeamCSV>(reader)
-                    .withType(TeamCSV.class)
-                    .withIgnoreLeadingWhiteSpace(true)
-                    .build();
 
-            List<TeamCSV> teamsObj = csvToBean.parse();
-
-            for (TeamCSV o : teamsObj) {
-                Team team = o.toBeanWithId();
+            List<TeamCSV> result = CSVParser.parse(reader, TeamCSV.class);
+            result.forEach((teamCsv -> {
                 try {
+                    Team team = teamCsv.mapToDao();
+
                     repository.save(team);
                     teams.add(team);
-
                 } catch (Exception ex) {
-                    log.error("{} can't be saved: {}", team, ex.getMessage());
+                    log.error("{} can't be stored in the database due to: \n\t{}", teamCsv, ex.getMessage());
                 }
-            }
+            }));
 
         } catch (Exception ex) {
-            log.error("An error occurred while processing the CSV file.");
+            log.error("Unable to read csv file.");
         }
 
         return teams;
@@ -124,9 +109,4 @@ public class TeamServiceImp implements TeamService {
         log.warn("Trying to delete a Team with wrong ID");
         return false;
     }
-
-    /*
-     TODO: Validate Entity
-        email
-     */
 }
