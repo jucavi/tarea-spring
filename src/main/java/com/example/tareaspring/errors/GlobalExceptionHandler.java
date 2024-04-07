@@ -17,16 +17,11 @@ import java.util.*;
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<Map<String, Object>> handleMethodArgumentException(MethodArgumentNotValidException ex) {
+    public ResponseEntity<ApiError> handleMethodArgumentException(MethodArgumentNotValidException ex) {
 
         log.error(ex.getMessage());
 
         Map<String, String> errors = new HashMap<>();
-        Map<String, Object> body = new HashMap<>();
-
-        body.put("timestamp", LocalDateTime.now());
-        body.put("reason", HttpStatus.UNPROCESSABLE_ENTITY.getReasonPhrase());
-        body.put("code", HttpStatus.UNPROCESSABLE_ENTITY.value());
 
         ex.getBindingResult().getAllErrors().forEach(error -> {
             String message = error.getDefaultMessage();
@@ -40,9 +35,31 @@ public class GlobalExceptionHandler {
             }
         });
 
-        body.put("errors", errors);
+        return ResponseEntity.unprocessableEntity().body(new ApiError(
+                HttpStatus.UNPROCESSABLE_ENTITY,
+                LocalDateTime.now(),
+                errors
+        ));
+    }
 
-        return ResponseEntity.unprocessableEntity().body(body);
+    @ExceptionHandler({
+            PlayerNotFoundException.class,
+            TeamNotFoundException.class,
+            SigningNotFoundException.class
+    })
+    public ResponseEntity<ApiError> handleNotFoundException(RuntimeException ex) {
+
+        String message = ex.getMessage();
+        log.error(message);
+
+        Map<String, String> errors = new HashMap<>();
+        errors.put("entity", message);
+
+        return ResponseEntity.unprocessableEntity().body(new ApiError(
+                HttpStatus.NOT_FOUND,
+                LocalDateTime.now(),
+                errors
+        ));
     }
 
 //    @ExceptionHandler(Exception.class)
