@@ -1,19 +1,14 @@
 package com.example.tareaspring.models;
 
-import com.example.tareaspring.utils.validators.ValueOfEnum;
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.lang.NonNull;
 
 import javax.persistence.*;
-import javax.validation.constraints.*;
 
 import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
-
 
 @Getter
 @Setter
@@ -27,62 +22,36 @@ public class Player {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank(message = "Player firstname can't be empty")
     @Column(nullable = false)
     private String firstname;
 
     @Column(nullable = false)
-    @NotBlank(message = "Player lastname can't be empty")
     private String lastname;
 
     @Column(unique = true, nullable = false)
-//    @Email(message = "Email address must be valid") // not check blank
-    @Pattern(regexp = "^[a-zA-Z0-9_!#$%&'*+=?`{|}~^.-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{1,4}$", message = "Email address must be valid")
     private String email;
 
-    @NotNull
-    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
-    @JsonFormat(pattern = "yyyy-MM-dd")
     @Column(nullable = false)
     private LocalDate birthdate;
 
-    //@NotNull(message = "Position can't be null")
     @Column(nullable = false)
-    @Enumerated(EnumType.STRING)
-    @ValueOfEnum(enumClass = FieldPosition.class, message = "Position not allowed")
     private FieldPosition position;
 
-    //@NotNull(message = "Gender can't be null")
     @Column(nullable = false)
-    @Enumerated(EnumType.STRING)
-    @ValueOfEnum(enumClass = Gender.class, message = "Gender not allowed")
     private Gender gender;
 
-    @NotNull
-    @Min(value = 0, message = "Weight should be greater than 0 Kilograms")
-    @Max(value = 300, message = "Weight should be lesser than 300 Kilograms")
     @Column(nullable = false)
     private Integer weight;
 
-    @NotNull
-    @Min(value = 0, message = "High should be greater than 0 centimeters")
-    @Max(value = 300, message = "High should be lesser than 300 centimeters")
     @Column(nullable = false)
     private Integer high;
 
-    @Setter
-    @NotNull
     @Column(nullable = false)
     private Double imc;
 
-    @Setter
-    @NotNull
-    @Min(value = 3, message = "Fat should be greater than 3 percent")
-    @Max(value = 40, message = "Fat should be lesser than 40 percent")
     @Column(nullable = false)
     private Integer fat;
 
-    @Setter
     @JsonIgnore
     @OneToMany(mappedBy = "player", fetch = FetchType.EAGER, cascade = CascadeType.REMOVE)
     Set<Signing> signingSet = new HashSet<>();
