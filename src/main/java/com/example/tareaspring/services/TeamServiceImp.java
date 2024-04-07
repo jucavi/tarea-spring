@@ -4,6 +4,7 @@ import com.example.tareaspring.dto.TeamCSV;
 import com.example.tareaspring.models.Team;
 import com.example.tareaspring.repositories.TeamRepository;
 import com.example.tareaspring.utils.parsers.CSVParser;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
@@ -16,15 +17,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-// TODO: Move to Lombok @log annotation
 @Service
+@RequiredArgsConstructor
 @Log4j2
 public class TeamServiceImp implements TeamService {
     private final TeamRepository repository;
 
-    public TeamServiceImp(TeamRepository repository) {
-        this.repository = repository;
-    }
 
     @Override
     public List<Team> parseCSVFileToTeams(@NonNull MultipartFile file) {

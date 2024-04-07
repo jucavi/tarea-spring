@@ -2,6 +2,7 @@ package com.example.tareaspring.controllers;
 
 import com.example.tareaspring.models.Signing;
 import com.example.tareaspring.services.SigningServiceImp;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -10,14 +11,12 @@ import javax.validation.Valid;
 import java.util.List;
 
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("api/v1/signings")
 public class SigningController {
 
     private final SigningServiceImp service;
 
-    public SigningController(SigningServiceImp service) {
-        this.service = service;
-    }
 
     /**
      * Get all signings from database

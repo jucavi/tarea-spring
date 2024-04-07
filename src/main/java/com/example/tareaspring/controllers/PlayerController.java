@@ -1,8 +1,10 @@
 package com.example.tareaspring.controllers;
 
+
 import com.example.tareaspring.models.Player;
 import com.example.tareaspring.models.Signing;
 import com.example.tareaspring.services.PlayerServiceImp;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -13,14 +15,11 @@ import java.util.Optional;
 import java.util.Set;
 
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/api/v1/players")
 public class PlayerController {
 
     private final PlayerServiceImp service;
-
-    public PlayerController(PlayerServiceImp service) {
-        this.service = service;
-    }
 
     /**
      * Get all players from database

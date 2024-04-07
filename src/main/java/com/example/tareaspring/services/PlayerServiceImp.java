@@ -5,6 +5,7 @@ import com.example.tareaspring.dto.PlayerCSV;
 import com.example.tareaspring.repositories.PlayerRepository;
 import com.example.tareaspring.utils.parsers.CSVParser;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
@@ -17,16 +18,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-// TODO: Move to Lombok @log annotation
 @Log4j2
+@RequiredArgsConstructor
 @Service
 public class PlayerServiceImp implements PlayerService {
 
     private final PlayerRepository repository;
 
-    public PlayerServiceImp(PlayerRepository repository) {
-        this.repository = repository;
-    }
 
     @Override
     public List<Player> parseCSVFileToPlayers(@NonNull MultipartFile file) {
@@ -82,6 +80,7 @@ public class PlayerServiceImp implements PlayerService {
     @Override
     public Player update(Player player) {
 
+        //repository.findById(player.getId()).orElse(null);
         if (player.getId() != null && !repository.existsById(player.getId())) {
             log.warn("Trying to update a player with wrong ID");
             return null;

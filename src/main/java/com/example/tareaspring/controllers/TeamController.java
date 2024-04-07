@@ -2,6 +2,7 @@ package com.example.tareaspring.controllers;
 
 import com.example.tareaspring.models.Team;
 import com.example.tareaspring.services.TeamServiceImp;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -10,15 +11,12 @@ import javax.validation.Valid;
 import java.util.List;
 
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("api/v1/teams")
 public class TeamController {
 
     private final TeamServiceImp service;
 
-    // Necesario para la inyección de dependencias
-    public TeamController(TeamServiceImp service) {
-        this.service = service;
-    }
 
     // CRUD sobre la entidad Team
     /**
