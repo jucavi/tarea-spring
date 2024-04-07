@@ -1,12 +1,19 @@
 package com.example.tareaspring.services;
 
+import com.example.tareaspring.dto.PlayerTeamsResponseDto;
+import com.example.tareaspring.errors.CreateEntityException;
+import com.example.tareaspring.errors.PlayerNotFoundException;
 import com.example.tareaspring.models.Player;
 import com.example.tareaspring.dto.PlayerCSV;
+import com.example.tareaspring.models.Signing;
+import com.example.tareaspring.models.Team;
 import com.example.tareaspring.repositories.PlayerRepository;
 import com.example.tareaspring.utils.parsers.CSVParser;
 
+import com.example.tareaspring.utils.validators.utils.DateUtilsValidator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.modelmapper.ModelMapper;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -14,9 +21,11 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Log4j2
 @RequiredArgsConstructor
@@ -26,49 +35,33 @@ public class PlayerServiceImp implements PlayerService {
     private final PlayerRepository repository;
 
 
-    @Override
-    public List<Player> parseCSVFileToPlayers(@NonNull MultipartFile file) {
-
-        List<Player> players = new ArrayList<>();
-        try (Reader reader = new BufferedReader(new InputStreamReader(file.getInputStream()))) {
-
-            List<PlayerCSV> result = CSVParser.parse(reader, PlayerCSV.class);
-            result.forEach((playerCsv -> {
-                try {
-                    Player player = playerCsv.mapToDao();
-
-                    repository.save(player);
-                    players.add(player);
-                } catch (Exception ex) {
-                    log.error("{} can't be stored in the database due to: \n\t{}", playerCsv, ex.getMessage());
-                }
-            }));
-
-        } catch (Exception ex) {
-            log.error("Unable to read csv file.");
-        }
-
-        return players;
-    }
-
+    /**
+     * Retrieve all players
+     * @return list of players in the database
+     */
     @Override
     public List<Player> findAll() {
         log.info("Retrieving all players from database");
         return repository.findAll();
     }
 
+    /**
+     * Find player by ID
+     */
     @Override
     public Optional<Player> findById(Long id) {
         log.info("Retrieving player with ID: {}", id);
         return repository.findById(id);
     }
 
+    /**
+     * Create player in database
+     */
     @Override
     public Player create(Player player) {
 
         if (player.getId() != null) {
-            log.warn("Trying to create a player with assigned ID: {}", player.getId());
-            return null;
+            throw new CreateEntityException("Change ID yo null");
         }
 
         Player result = repository.save(player);
@@ -77,31 +70,139 @@ public class PlayerServiceImp implements PlayerService {
         return result;
     }
 
+
+    /**
+     * Update player in database
+     */
     @Override
     public Player update(Player player) {
 
-        //repository.findById(player.getId()).orElse(null);
-        if (player.getId() != null && !repository.existsById(player.getId())) {
-            log.warn("Trying to update a player with wrong ID");
-            return null;
+        if (player.getId() == null) {
+            throw new PlayerNotFoundException(player.getId());
         }
 
         Player result = repository.save(player);
-        log.info("Player updated with ID: {}", player.getId());
 
+        log.info("Player updated with ID: {}", player.getId());
         return result;
     }
 
+    /**
+     * Delete a player from database
+     */
     @Override
-    public Boolean deleteById(Long id) {
+    public void deleteById(Long id) {
 
-        if (repository.existsById(id)) {
-            repository.deleteById(id);
-            log.info("Player deleted");
-            return true;
+        log.info("Trying to delete a player with ID: {}", id);
+        repository.findById(id)
+                .orElseThrow(() -> new PlayerNotFoundException(id));
+
+        repository.deleteById(id);
+    }
+
+    /**
+     * All player signings
+     */
+    @Override
+    public List<PlayerTeamsResponseDto> getUserSignings(Long id) {
+
+        repository.findById(id)
+                .orElseThrow(() -> new PlayerNotFoundException(id));
+
+        log.info("Trying to retrieve all signings from player with ID: {}", id);
+
+        return repository.findById(id)
+                .get()
+                .getSignings()
+                .stream()
+                .map(s ->
+                        PlayerTeamsResponseDto.builder()
+                                .team(s.getTeam())
+                                .since(s.getSince())
+                                .until(s.getUntil())
+                                .squadNumber(s.getSquadNumber())
+                                .build()
+                )
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * All the teams where a player has played
+     */
+    @Override
+    public List<Team> getUserSigningsTeams(Long id) {
+
+        repository.findById(id)
+                .orElseThrow(() -> new PlayerNotFoundException(id));
+
+        log.info("Trying to retrieve all teams from player with ID: {}", id);
+
+        return repository.findById(id)
+                .get()
+                .getSignings()
+                .stream()
+                .map(Signing::getTeam)
+                .distinct()
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<PlayerTeamsResponseDto> getUserSigningAtDate(Long id, LocalDate date) {
+
+        repository.findById(id)
+                .orElseThrow(() -> new PlayerNotFoundException(id));
+
+        log.info("Trying to retrieve team where a player with ID: {} has signed at {}", id, date);
+
+        return repository.findById(id)
+                .get()
+                .getSignings()
+                .stream()
+                .filter(s ->
+                        // signings in range since <= date <= until
+                        DateUtilsValidator.isDateInRange(s.getSince(), s.getUntil(), date)
+                )
+                .map(s ->
+                        PlayerTeamsResponseDto.builder()
+                                .team(s.getTeam())
+                                .since(s.getSince())
+                                .until(s.getUntil())
+                                .squadNumber(s.getSquadNumber())
+                                .build()
+                )
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public Boolean isUserSignedAt(Long id, LocalDate date) {
+        List<PlayerTeamsResponseDto> signings = getUserSigningAtDate(id, date);
+
+        return signings.isEmpty();
+    }
+
+
+    @Override
+    public List<Player> parseCSVFileToPlayers(@NonNull MultipartFile file) {
+
+        List<Player> players = new ArrayList<>();
+        try (Reader reader = new BufferedReader(new InputStreamReader(file.getInputStream()))) {
+
+            List<PlayerCSV> result = CSVParser.parse(reader, PlayerCSV.class);
+            result.forEach(playerCSV -> {
+                try {
+                    Player player = playerCSV.mapToDao();
+
+                    repository.save(player);
+                    players.add(player);
+                } catch (Exception ex) {
+                    log.error("{} can't be stored in the database due to: \n\t{}", playerCSV, ex.getMessage());
+                }
+            });
+
+        } catch (Exception ex) {
+            log.error("Unable to read csv file.");
         }
 
-        log.warn("Trying to delete a Player with wrong ID");
-        return false;
+        return players;
     }
 }

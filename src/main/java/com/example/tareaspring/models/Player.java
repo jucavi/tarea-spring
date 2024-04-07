@@ -7,8 +7,8 @@ import org.springframework.lang.NonNull;
 import javax.persistence.*;
 
 import java.time.LocalDate;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Setter
@@ -54,7 +54,7 @@ public class Player {
 
     @JsonIgnore
     @OneToMany(mappedBy = "player", fetch = FetchType.EAGER, cascade = CascadeType.REMOVE)
-    Set<Signing> signingSet = new HashSet<>();
+    List<Signing> signings = new ArrayList<>();
 
 
     public Player(

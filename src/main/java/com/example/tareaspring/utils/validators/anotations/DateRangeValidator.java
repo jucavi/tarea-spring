@@ -1,4 +1,4 @@
-package com.example.tareaspring.utils.validators;
+package com.example.tareaspring.utils.validators.anotations;
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;

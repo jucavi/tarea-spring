@@ -1,18 +1,25 @@
 package com.example.tareaspring.controllers;
 
 
+import com.example.tareaspring.dto.PlayerDto;
+import com.example.tareaspring.dto.PlayerTeamsResponseDto;
+import com.example.tareaspring.dto.converter.PlayerDtoConverter;
+import com.example.tareaspring.errors.DateFormatException;
+import com.example.tareaspring.errors.PlayerNotFoundException;
 import com.example.tareaspring.models.Player;
-import com.example.tareaspring.models.Signing;
+import com.example.tareaspring.models.Team;
 import com.example.tareaspring.services.PlayerServiceImp;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
+import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 import java.util.List;
-import java.util.Optional;
-import java.util.Set;
 
 @RestController
 @RequiredArgsConstructor
@@ -20,99 +27,100 @@ import java.util.Set;
 public class PlayerController {
 
     private final PlayerServiceImp service;
+    private final ModelMapper modelMapper;
+
 
     /**
      * Get all players from database
-     * @return all player from the database
      */
     @GetMapping
     public ResponseEntity<List<Player>> findAll() {
+
         return ResponseEntity.ok(service.findAll());
     }
 
 
     /**
      * Find a player from database
-     * @param id player identifier
-     * @return player if exists, otherwise {@code 404 } not found
      */
     @GetMapping("/{id}")
     public ResponseEntity<Player> findById(@PathVariable Long id) {
-        Optional<Player> result = service.findById(id);
-
-        return result.map(ResponseEntity::ok).orElseThrow(RuntimeException::new);
+        return service.findById(id)
+                .map(ResponseEntity::ok)
+                .orElseThrow(() -> new PlayerNotFoundException(id));
     }
 
-    /**
-     * Find signing of a player  from database
-     * @param id player identifier
-     * @return list of signings, otherwise {@code 404 } not found
-     */
-    @GetMapping("/{id}/signings")
-    public ResponseEntity<Set<Signing>> findSigningsByPlayerId(@PathVariable Long id) {
-
-//        Player result = service.findById(id);
-//
-//        if (result != null) {
-//            return ResponseEntity.ok(result);
-//        }
-
-        return ResponseEntity.notFound().build();
-    }
 
     /**
      * Create a player in the database
-     * @param player player
-     * @return player if created, otherwise {@code 404 } not found
      */
     @PostMapping
-    public ResponseEntity<Player> create(@RequestBody @Valid Player player) {
-        Player result = service.create(player);
-
-        if (result != null) {
-            return ResponseEntity.ok(result);
-        }
-
-        return ResponseEntity.notFound().build();
+    public ResponseEntity<Player> create(@RequestBody @Valid PlayerDto playerDto) {
+        return ResponseEntity.ok(
+                service.create(modelMapper.map(playerDto, Player.class))
+        );
     }
+
 
     /**
      * Update player info
-     * @param player player
-     * @return player if updated, otherwise {@code 404 } not found
      */
     @PutMapping
-    public ResponseEntity<Player> update(@RequestBody @Valid  Player player) {
-        Player result = service.update(player);
-
-        if (result != null) {
-            return ResponseEntity.ok(result);
-        }
-
-        return ResponseEntity.notFound().build();
+    public ResponseEntity<Player> update(@RequestBody @Valid  PlayerDto playerDto) {
+        return ResponseEntity.ok(
+            service.update(modelMapper.map(playerDto, Player.class))
+        );
     }
+
 
     /**
      * Delete a player from a database
-     * @param id player identifier
-     * @return {@code true} if a player was deleted, {@code 404 } not found
      */
     @DeleteMapping("/{id}")
-    public ResponseEntity<Boolean> delete(@PathVariable Long id) {
-
-        Boolean result = service.deleteById(id);
-
-        if (result) {
-            return ResponseEntity.ok(true);
-        }
-
-        return ResponseEntity.notFound().build();
+    public ResponseEntity<?> delete(@PathVariable Long id) {
+        service.deleteById(id);
+        return ResponseEntity.ok().build();
     }
 
+
     /**
-     * Persist all registries from csv file into database
-     * @param file file
-     * @return List of players persisted, otherwise an empty list
+     * Find all signings of a player from database
+     */
+    @GetMapping("/{id}/signings")
+    public ResponseEntity<List<PlayerTeamsResponseDto>> findSigningsByPlayerId(@PathVariable Long id) {
+
+        return ResponseEntity.ok(service.getUserSignings(id));
+    }
+
+
+    /**
+     * Find all the teams where a player has played
+     */
+    @GetMapping("/{id}/signings/teams/all")
+    public ResponseEntity<List<Team>> findTeasByPlayerId(@PathVariable Long id) {
+
+        return ResponseEntity.ok(service.getUserSigningsTeams(id));
+    }
+
+
+   /**
+     * Find team where a player has signed at {@code date} passed as parameter
+     */
+    @GetMapping("/{id}/signings/teams/at")
+    public ResponseEntity<List<PlayerTeamsResponseDto>> findSigningsByPlayerIdAt(@PathVariable Long id, @RequestParam @NonNull String date) throws DateFormatException {
+        try {
+
+            LocalDate localDate = LocalDate.parse(date);
+            return ResponseEntity.ok(service.getUserSigningAtDate(id, localDate));
+
+        } catch (DateTimeParseException ex) {
+            throw new DateFormatException("Invalid Date format (yyyy-MM-dd)");
+        }
+    }
+
+
+    /**
+     * Persist registries from csv file into database
      */
     @PostMapping("/upload")
     public ResponseEntity<List<Player>> upload(@RequestParam("file") MultipartFile file) {

@@ -22,10 +22,10 @@ public class SigningCSV implements CsvDtoInterface<Signing> {
     private Long id;
 
     @CsvBindByName(required = true, column = "playerId")
-    Long playerId;
+    private Long playerId;
 
     @CsvBindByName(required = true, column = "teamId")
-    Long teamId;
+    private Long teamId;
 
     @CsvBindByName(required = true)
     @CsvDate(value = "yyyy-MM-dd")

@@ -1,13 +1,24 @@
 package com.example.tareaspring.controllers;
 
+import com.example.tareaspring.dto.SigningDto;
+import com.example.tareaspring.dto.TeamDto;
+import com.example.tareaspring.dto.TeamPlayerResponseDto;
+import com.example.tareaspring.errors.DateFormatException;
+import com.example.tareaspring.errors.TeamNotFoundException;
+import com.example.tareaspring.models.Player;
+import com.example.tareaspring.models.Signing;
 import com.example.tareaspring.models.Team;
 import com.example.tareaspring.services.TeamServiceImp;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
+import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 import java.util.List;
 
 @RestController
@@ -16,57 +27,51 @@ import java.util.List;
 public class TeamController {
 
     private final TeamServiceImp service;
+    private final ModelMapper modelMapper;
 
 
-    // CRUD sobre la entidad Team
     /**
      * Get all teams from database
-     * @return all teams from the database
      */
     @GetMapping
     public ResponseEntity<List<Team>> findAll() {
+
         return ResponseEntity.ok(service.findAll());
     }
 
+
     /**
      * Find a team from database
-     * @param id team identifier
-     * @return team if exists, otherwise {@code 404 } not found
      */
     @GetMapping("/{id}")
     public ResponseEntity<Team> findById(@PathVariable Long id) {
-        Team result = service.findById(id);
-
-        return ResponseEntity.ok(result);
+        return service.findById(id)
+                .map(ResponseEntity::ok)
+                .orElseThrow(() -> new TeamNotFoundException(id));
     }
+
 
     /**
      * Create a team in the database
-     * @param team team
-     * @return team if created, otherwise {@code 404 } not found
      */
     @PostMapping
-    public ResponseEntity<Team> create(@RequestBody @Valid Team team) {
-        Team result = service.create(team);
-
-        return ResponseEntity.ok(result);
+    public ResponseEntity<Team> create(@RequestBody @Valid TeamDto teamDto) {
+        return ResponseEntity.ok(
+                service.create(modelMapper.map(teamDto, Team.class))
+        );
     }
+
 
     /**
      * Update team info
-     * @param team team
-     * @return team if updated, otherwise {@code 404 } not found
      */
     @PutMapping
-    public ResponseEntity<Team> update(@RequestBody @Valid Team team) {
-        Team result = service.update(team);
-
-        if (result != null) {
-            return ResponseEntity.ok(result);
-        }
-
-        return ResponseEntity.notFound().build();
+    public ResponseEntity<Team> update(@RequestBody @Valid TeamDto teamDto) {
+        return ResponseEntity.ok(
+                service.update(modelMapper.map(teamDto, Team.class))
+        );
     }
+
 
     /**
      * Delete a team from a database
@@ -75,13 +80,59 @@ public class TeamController {
      */
     @DeleteMapping("/{id}")
     public ResponseEntity<Boolean> delete(@PathVariable Long id) {
-        Boolean result = service.deleteById(id);
+        service.deleteById(id);
+        return ResponseEntity.ok().build();
+    }
 
-        if (result) {
-            return ResponseEntity.ok(true);
+
+    /**
+     * Find signings of a team from database
+     */
+    @GetMapping("/{id}/signings")
+    public ResponseEntity<List<TeamPlayerResponseDto>> findSigningsByPlayerId(@PathVariable Long id) {
+
+        return ResponseEntity.ok(service.getTeamSignings(id));
+    }
+
+
+    /**
+     * All players who have been signed by a team
+     */
+    @GetMapping("/{id}/signings/players/all")
+    public ResponseEntity<List<Player>> findTeasByPlayerId(@PathVariable Long id) {
+
+        return ResponseEntity.ok(service.getTeamSigningsPlayers(id));
+    }
+
+    /**
+     * Find players where has signed for a team at {@code date} passed as parameter
+     */
+    @GetMapping("/{id}/signings/players/at")
+    public ResponseEntity<List<TeamPlayerResponseDto>> findSigningsByTeamIdAt(
+            @PathVariable Long id,
+            @RequestParam @NonNull String date) throws DateFormatException {
+        try {
+
+            LocalDate localDate = LocalDate.parse(date);
+            return ResponseEntity.ok(service.getSigningsAtDate(id, localDate));
+
+        } catch (DateTimeParseException ex) {
+            throw new DateFormatException("Invalid Date format (yyyy-MM-dd)");
         }
+    }
 
-        return ResponseEntity.notFound().build();
+    /**
+     * Create a signing
+     */
+    // TODO
+    @PostMapping("/{id}/signings/players/{playerId}/create")
+    public ResponseEntity<Signing> createSigning(@RequestBody SigningDto signingDto) {
+
+//        return ResponseEntity.ok(
+//                service.createSigning(modelMapper.map(signingDto, Signing.class))
+//        );
+        System.out.println(signingDto);
+        return ResponseEntity.ok(modelMapper.map(signingDto, Signing.class));
     }
 
     /**

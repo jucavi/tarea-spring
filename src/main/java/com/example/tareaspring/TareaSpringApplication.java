@@ -19,7 +19,6 @@ public class TareaSpringApplication {
 		ApplicationContext context = SpringApplication.run(TareaSpringApplication.class, args);
 
 		LocalDate since = LocalDate.of(2000, 2, 13);
-		LocalDate until = LocalDate.of(2025, 6, 13);
 
 		PlayerRepository playerRep = context.getBean(PlayerRepository.class);
 		TeamRepository teamRep = context.getBean(TeamRepository.class);
@@ -28,8 +27,11 @@ public class TareaSpringApplication {
 
 		// crear un jugador y almacenar
 		Player player = new Player(null, "player", "one", "email@email.es", since, FieldPosition.Defensa, Gender.Mujer, 67, 178, 7);
+		// month with octal value
+		//Player player1 = new Player(1L,"Adelle","Fiester","Adelle.Fiester@player.com", LocalDate.of(1993, 4, 29), FieldPosition.Defensa,Gender.Hombre,64,166,33.6,8);
 		System.out.println("Número de jugadores en la base de datos: " + playerRep.findAll().size());
 		playerRep.save(player);
+		//playerRep.save(player1);
 		System.out.println("Número de jugadores en la base de datos: " + playerRep.findAll().size());
 		System.out.printf("Imc: %,.6f%n", player.getImc());
 		player.setHigh(200);
@@ -37,20 +39,34 @@ public class TareaSpringApplication {
 		System.out.printf("Imc: %,.6f%n", player.getImc());
 
 		// Crear un equipo y almacenar
-		Team team = new Team(null, "team", "teamemail@email.es", since, "Santander", null);
+		Team team1 = new Team(null, "team1", "team1email@email.es", since, "Santander", null);
+		Team team2 = new Team(null, "team2", "team2email@email.es", since, "Santander", null);
 		System.out.println("Número de equipos en la base de datos: " + teamRep.findAll().size());
-		teamRep.save(team);
+		teamRep.save(team1);
+		teamRep.save(team2);
 		System.out.println("Número de equipos en la base de datos: " + teamRep.findAll().size());
 
-		Optional<Player> op = playerRep.findById(1L);
-		Optional<Team> ot = teamRep.findById(1L);
+		Optional<Player> op1 = playerRep.findById(1L);
+		Optional<Team> ot1 = teamRep.findById(1L);
+		Optional<Team> ot2 = teamRep.findById(2L);
 
-		Player p = op.orElseThrow();
-		Team t = ot.orElseThrow();
 
-		Signing signing = new Signing(null, p, t, since, until, 66);
+		Signing signing1 = new Signing(null, op1.get(), ot1.get(),
+				LocalDate.of(2000, 1, 23),
+				LocalDate.of(2000, 6, 13),
+				66);
+		Signing signing2 = new Signing(null, op1.get(), ot1.get(),
+				LocalDate.of(2010, 1, 23),
+				LocalDate.of(2020, 6, 13),
+				66);
+		Signing signing3 = new Signing(null, op1.get(), ot1.get(),
+				LocalDate.of(2000, 5, 1),
+				LocalDate.of(2000, 6, 18),
+				66);
 		System.out.println("Número de joining data en la base de datos: " + signRep.findAll().size());
-		signRep.save(signing);
+		signRep.save(signing1);
+		signRep.save(signing2);
+		signRep.save(signing3);
 		System.out.println("Número de joining data en la base de datos: " + signRep.findAll().size());
 	}
 
