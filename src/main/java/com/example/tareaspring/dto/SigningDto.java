@@ -35,6 +35,7 @@ public class SigningDto {
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate until;
 
+    @NotNull
     @Min(value = 0, message = "Squad number should be greater or equal than 0")
     @Max(value = 99, message = "Squad number should be lesser or equal than 99")
     private Integer squadNumber;

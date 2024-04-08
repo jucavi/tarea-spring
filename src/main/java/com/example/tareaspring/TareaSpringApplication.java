@@ -2,9 +2,6 @@ package com.example.tareaspring;
 
 
 import com.example.tareaspring.models.*;
-import com.example.tareaspring.repositories.PlayerRepository;
-import com.example.tareaspring.repositories.SigningRepository;
-import com.example.tareaspring.repositories.TeamRepository;
 import com.example.tareaspring.services.PlayerService;
 import com.example.tareaspring.services.SigningService;
 import com.example.tareaspring.services.TeamService;
@@ -19,8 +16,11 @@ import java.util.*;
 public class TareaSpringApplication {
 
 	public static void main(String[] args){
+
+
 		ApplicationContext context = SpringApplication.run(TareaSpringApplication.class, args);
 
+		// TODO CREATE TEST CASES
 		LocalDate since = LocalDate.of(2000, 2, 13);
 
 		PlayerService playerS = context.getBean(PlayerService.class);
@@ -92,26 +92,25 @@ public class TareaSpringApplication {
 //				null,
 //				p1.get(),
 //				t1.get(),
-//				LocalDate.of(2000, 1, 1),
-//				LocalDate.of(2000, 6, 1),
-//				66);
+//				LocalDate.of(2001, 1, 1),
+//				LocalDate.of(2002, 1, 1),
+//				6);
 //
-//		// player with signing on different team invalid
 //		Signing signing2 = new Signing(
 //				null,
 //				p1.get(),
-//				t2.get(),
-//				LocalDate.of(2000, 2, 23),
-//				LocalDate.of(2000, 7, 13),
-//				55);
+//				t1.get(),
+//				LocalDate.of(2002, 4, 1),
+//				LocalDate.of(2002, 12, 1),
+//				8);
 //
 //		// player with signing on same team invalid
 //		Signing signing3 = new Signing(
 //				null,
-//				p1.get(),
+//				p2.get(),
 //				t1.get(),
-//				LocalDate.of(2000, 2, 23),
-//				LocalDate.of(2000, 7, 13),
+//				LocalDate.of(2001, 5, 1),
+//				LocalDate.of(2002, 5, 1),
 //				55);
 //
 //		// player with valid range but no number invalid

@@ -33,6 +33,7 @@ public class Signing {
     @Column(nullable = false)
     private LocalDate until;
 
+    @Column(nullable = false)
     private Integer squadNumber;
 
     @Override

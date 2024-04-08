@@ -3,7 +3,6 @@ package com.example.tareaspring.controllers;
 
 import com.example.tareaspring.dto.PlayerDto;
 import com.example.tareaspring.dto.PlayerTeamsResponseDto;
-import com.example.tareaspring.dto.converter.PlayerDtoConverter;
 import com.example.tareaspring.errors.DateFormatException;
 import com.example.tareaspring.errors.PlayerNotFoundException;
 import com.example.tareaspring.models.Player;
@@ -23,7 +22,7 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/players")
+@RequestMapping("/players")
 public class PlayerController {
 
     private final PlayerServiceImp service;
