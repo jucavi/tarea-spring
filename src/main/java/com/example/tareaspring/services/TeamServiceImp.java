@@ -1,14 +1,11 @@
 package com.example.tareaspring.services;
 
-import com.example.tareaspring.dto.SigningDto;
 import com.example.tareaspring.dto.TeamCSV;
 import com.example.tareaspring.dto.TeamPlayerResponseDto;
 import com.example.tareaspring.errors.*;
 import com.example.tareaspring.models.Player;
 import com.example.tareaspring.models.Signing;
 import com.example.tareaspring.models.Team;
-import com.example.tareaspring.repositories.PlayerRepository;
-import com.example.tareaspring.repositories.SigningRepository;
 import com.example.tareaspring.repositories.TeamRepository;
 import com.example.tareaspring.utils.parsers.CSVParser;
 import com.example.tareaspring.utils.validators.utils.DateUtilsValidator;
@@ -25,7 +22,6 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 @Service
@@ -34,8 +30,6 @@ import java.util.stream.Collectors;
 public class TeamServiceImp implements TeamService {
 
     private final TeamRepository repository;
-    private final PlayerRepository playerRepository;
-    private final SigningRepository signingRepository;
 
 
     /**
@@ -202,133 +196,6 @@ public class TeamServiceImp implements TeamService {
                 .collect(Collectors.toList());
     }
 
-    /**
-     * Check if player had been signed already or squad number had been taken
-     * at date passed as parameter
-     */
-    @Override
-    public Boolean isPlayerOrSquadNumberPresentAt(Long teamId, Long playerId, Integer squadNumber, LocalDate date) {
-        List<TeamPlayerResponseDto> currentPlayers = getSigningsAtDate(teamId, date);
-
-        // TODO: Throw custom Exceptions to write logs for player and number
-        Predicate<TeamPlayerResponseDto> squadNumberPresent = tp -> tp.getSquadNumber().equals(squadNumber);
-        Predicate<TeamPlayerResponseDto> isPlayerSigned = p -> p.getPlayer().getId().equals(playerId);
-        Predicate<TeamPlayerResponseDto> combinedCondition = squadNumberPresent.or(isPlayerSigned);
-
-        return currentPlayers.stream().anyMatch(combinedCondition);
-    }
-
-    /**
-     * Check if squad number had been taken
-     * at date passed as parameter
-     */
-    @Override
-    public Boolean isSquadNumberPresentAt(Long teamId, Integer squadNumber, LocalDate date) {
-        List<TeamPlayerResponseDto> currentPlayers = getSigningsAtDate(teamId, date);
-
-        // TODO: Throw custom Exceptions to write logs for player and number -> change to for
-        Predicate<TeamPlayerResponseDto> squadNumberPresent = tp -> tp.getSquadNumber().equals(squadNumber);
-
-        return currentPlayers.stream().anyMatch(squadNumberPresent);
-    }
-
-    @Override
-    public Boolean isSquadNumberPresentAt(Signing signing) {
-        Long teamId = signing.getTeam().getId(); // not null
-        Integer squadNumber = signing.getSquadNumber(); // 0-99
-        LocalDate since = signing.getSince(); // since before until / valid dates
-        LocalDate until = signing.getUntil();
-
-        return isSquadNumberPresentAt(teamId, squadNumber, since)
-                || isSquadNumberPresentAt(teamId, squadNumber, until);
-    }
-
-    /**
-     * Check if player had been signed already or squad number had been taken
-     * at date passed as parameter
-     */
-    @Override
-    public Boolean isPlayerOrSquadNumberPresentAt(SigningDto signingDto) {
-        // @Valid from controller
-        Long teamId = signingDto.getTeam().getId(); // not null
-        Long playerId = signingDto.getPlayer().getId(); // not null
-        Integer squadNumber = signingDto.getSquadNumber(); // 0-99
-        LocalDate since = signingDto.getSince(); // since before until / valid dates
-        LocalDate until = signingDto.getUntil();
-
-        return isPlayerOrSquadNumberPresentAt(teamId, playerId, squadNumber, since)
-                || isPlayerOrSquadNumberPresentAt(teamId, playerId, squadNumber, until);
-    }
-
-    /**
-     * Check if player had been signed already or squad number had been taken
-     * at date passed as parameter
-     */
-    @Override
-    public Boolean isPlayerOrSquadNumberPresentAt(Signing signing) {
-        // Valid from controller
-        Long teamId = signing.getTeam().getId(); // not null
-        Long playerId = signing.getPlayer().getId(); // not null
-        Integer squadNumber = signing.getSquadNumber(); // 0-99
-        LocalDate since = signing.getSince(); // since before until / valid dates
-        LocalDate until = signing.getUntil();
-
-        return isPlayerOrSquadNumberPresentAt(teamId, playerId, squadNumber, since)
-                || isPlayerOrSquadNumberPresentAt(teamId, playerId, squadNumber, until);
-    }
-
-    @Override
-    public Signing createSigning(Signing signing) {
-
-        // TODO: CREATE TEAM OR PLAYER IF NOT EXIST AND VALID
-        log.info("Trying to create a signing...");
-
-        Long playerId = signing.getPlayer().getId();
-        Optional<Player> optionalPlayer = playerRepository.findById(playerId);
-
-        if (optionalPlayer.isEmpty()) {
-            throw new PlayerNotFoundException(playerId);
-        }
-
-        Long teamId = signing.getTeam().getId();
-        Optional<Team> optionalTeam = repository.findById(teamId);
-
-        if (optionalTeam.isEmpty()) {
-            throw new PlayerNotFoundException(teamId);
-        }
-
-        Integer squadNumber = signing.getSquadNumber();
-        LocalDate dateSince = signing.getSince();
-        LocalDate dateUntil = signing.getUntil();
-
-        List<Signing> allSignings = signingRepository.findAll();
-
-        allSignings.forEach(s -> {
-            if (s.getPlayer().getId().equals(playerId)) {
-                LocalDate since = s.getSince();
-                LocalDate until = s.getUntil();
-
-                // TODO: see signing service for logic
-                if ((since.isBefore(dateSince)
-                        && until.isAfter(dateSince)) // date since in signing range
-                        || ((since.isBefore(dateUntil) // date until in signing range
-                        && until.isAfter(dateUntil)))) {
-                    throw new PlayerAlreadySignedException("Player has a current signing: " + playerId);
-                }
-            }
-
-            if (s.getPlayer().getId().equals(playerId)
-                    && s.getTeam().getId().equals(teamId)
-                    && isSquadNumberPresentAt(s)) {
-                throw new SquadNumberAlreadyTakenException("Squad number has already taken: " + squadNumber);
-            }
-        });
-
-        Signing result = signingRepository.save(signing);
-
-        log.info("Signing created with ID: {}", result.getId());
-        return result;
-    }
 
     /**
      * Parse data
