@@ -1,4 +1,4 @@
-id,playerId,teamId,since,until
+id,playerId,teamId,since,until,squadNumber
 1,362,5,2019-11-27,2023-03-26
 2,159,25,2019-12-09,2025-02-15
 3,120,11,2019-01-15,2024-12-19

@@ -2,6 +2,7 @@ package com.example.tareaspring.dto;
 
 import com.example.tareaspring.models.Player;
 import com.example.tareaspring.models.Team;
+import com.example.tareaspring.utils.validators.anotations.DateRange;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -15,6 +16,7 @@ import java.time.LocalDate;
 @Setter
 @Getter
 @NoArgsConstructor
+@DateRange(before = "since", after = "until", message = "Until date must be greater then since date")
 public class SigningDto {
 
     private Long id;

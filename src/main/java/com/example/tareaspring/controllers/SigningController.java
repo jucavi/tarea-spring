@@ -1,8 +1,10 @@
 package com.example.tareaspring.controllers;
 
+import com.example.tareaspring.errors.SigningNotFoundException;
 import com.example.tareaspring.models.Signing;
 import com.example.tareaspring.services.SigningServiceImp;
 import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -16,6 +18,7 @@ import java.util.List;
 public class SigningController {
 
     private final SigningServiceImp service;
+    private final ModelMapper modelMapper;
 
 
     /**
@@ -34,29 +37,22 @@ public class SigningController {
      */
     @GetMapping("/{id}")
     public ResponseEntity<Signing> findById(@PathVariable Long id) {
-        Signing result = service.findById(id);
-
-        if (result != null) {
-            return ResponseEntity.ok(result);
-        }
-
-        return ResponseEntity.notFound().build();
+        return service.findById(id)
+                .map(ResponseEntity::ok)
+                .orElseThrow(() -> new SigningNotFoundException(id));
     }
 
     /**
      * Create a Signing in the database
-     * @param signing signing
-     * @return player if created, otherwise {@code 404 } not found
      */
     @PostMapping
     public ResponseEntity<Signing> create(@RequestBody @Valid Signing signing) {
-        Signing result = service.create(signing);
-
-        if (result != null) {
-            return ResponseEntity.ok(result);
-        }
-
-        return ResponseEntity.notFound().build();
+//        return ResponseEntity.ok(
+//                service.create(modelMapper.map(signingDto, Signing.class))
+//        );
+        return ResponseEntity.ok(
+                service.create(signing)
+        );
     }
 
     /**

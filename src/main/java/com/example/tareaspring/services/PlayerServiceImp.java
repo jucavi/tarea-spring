@@ -2,7 +2,9 @@ package com.example.tareaspring.services;
 
 import com.example.tareaspring.dto.PlayerTeamsResponseDto;
 import com.example.tareaspring.errors.CreateEntityException;
+import com.example.tareaspring.errors.DatabaseSaveException;
 import com.example.tareaspring.errors.PlayerNotFoundException;
+import com.example.tareaspring.models.FieldPosition;
 import com.example.tareaspring.models.Player;
 import com.example.tareaspring.dto.PlayerCSV;
 import com.example.tareaspring.models.Signing;
@@ -61,13 +63,19 @@ public class PlayerServiceImp implements PlayerService {
     public Player create(Player player) {
 
         if (player.getId() != null) {
-            throw new CreateEntityException("Change ID yo null");
+            throw new CreateEntityException("Trying to create a player, but ID not null");
         }
 
-        Player result = repository.save(player);
+        try {
+            Player result = repository.save(player);
 
-        log.info("Player created with ID: {}", player.getId());
-        return result;
+            log.info("Player created with ID: {}", player.getId());
+            return result;
+
+        } catch (Exception ex) {
+            log.error(ex.getMessage());
+            throw new DatabaseSaveException("Unable to create Player");
+        }
     }
 
 
@@ -78,13 +86,33 @@ public class PlayerServiceImp implements PlayerService {
     public Player update(Player player) {
 
         if (player.getId() == null) {
-            throw new PlayerNotFoundException(player.getId());
+            throw new CreateEntityException("Error, trying to update player with ID: null");
         }
 
-        Player result = repository.save(player);
+        Long id = player.getId();
 
-        log.info("Player updated with ID: {}", player.getId());
-        return result;
+        try {
+            Player result = repository.save(
+                    new Player(
+                            id,
+                            player.getFirstname(),
+                            player.getLastname(),
+                            player.getEmail(),
+                            player.getBirthdate(),
+                            player.getPosition(),
+                            player.getGender(),
+                            player.getWeight(),
+                            player.getHigh(),
+                            player.getFat()) // imc calculated
+            );
+
+            log.info("Player updated with ID: {} to {}", id, player);
+            return result;
+
+        } catch (Exception ex) {
+            log.error(ex.getMessage());
+            throw new DatabaseSaveException("Unable to update player: " + player);
+        }
     }
 
     /**
@@ -173,13 +201,6 @@ public class PlayerServiceImp implements PlayerService {
                 .collect(Collectors.toList());
     }
 
-    @Override
-    public Boolean isUserSignedAt(Long id, LocalDate date) {
-        List<PlayerTeamsResponseDto> signings = getUserSigningAtDate(id, date);
-
-        return signings.isEmpty();
-    }
-
 
     @Override
     public List<Player> parseCSVFileToPlayers(@NonNull MultipartFile file) {
@@ -191,8 +212,15 @@ public class PlayerServiceImp implements PlayerService {
             result.forEach(playerCSV -> {
                 try {
                     Player player = playerCSV.mapToDao();
+                    Long id = player.getId();
 
-                    repository.save(player);
+                    // Si el csv viene con id sobreescribe
+                    if (id == null) {
+                        create(player);
+                    } else  {
+                        update(player);
+                    }
+
                     players.add(player);
                 } catch (Exception ex) {
                     log.error("{} can't be stored in the database due to: \n\t{}", playerCSV, ex.getMessage());

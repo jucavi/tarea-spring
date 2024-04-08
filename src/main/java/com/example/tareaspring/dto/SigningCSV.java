@@ -43,7 +43,7 @@ public class SigningCSV implements CsvDtoInterface<Signing> {
 
         return Signing.builder()
                 .id(this.id)
-                .player(Player.builder().id(this.teamId).build())
+                .player(Player.builder().id(this.playerId).build())
                 .team(Team.builder().id(this.teamId).build())
                 .since(this.since)
                 .until(this.until)

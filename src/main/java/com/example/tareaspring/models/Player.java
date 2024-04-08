@@ -54,7 +54,7 @@ public class Player {
 
     @JsonIgnore
     @OneToMany(mappedBy = "player", fetch = FetchType.EAGER, cascade = CascadeType.REMOVE)
-    List<Signing> signings = new ArrayList<>();
+    List<Signing> signings;
 
 
     public Player(

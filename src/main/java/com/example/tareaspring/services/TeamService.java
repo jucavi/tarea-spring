@@ -1,7 +1,9 @@
 package com.example.tareaspring.services;
 
+import com.example.tareaspring.dto.SigningDto;
 import com.example.tareaspring.dto.TeamPlayerResponseDto;
 import com.example.tareaspring.models.Player;
+import com.example.tareaspring.models.Signing;
 import com.example.tareaspring.models.Team;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -19,4 +21,10 @@ public interface TeamService {
     List<TeamPlayerResponseDto> getTeamSignings(Long id);
     List<Player> getTeamSigningsPlayers(Long id);
     List<TeamPlayerResponseDto> getSigningsAtDate(Long id, LocalDate date);
+    Boolean isPlayerOrSquadNumberPresentAt(Long teamId, Long playerId, Integer squadNumber, LocalDate date);
+    Boolean isPlayerOrSquadNumberPresentAt(SigningDto signingDto);
+    Boolean isPlayerOrSquadNumberPresentAt(Signing signing);
+    Boolean isSquadNumberPresentAt(Long teamId, Integer squadNumber, LocalDate date);
+    Boolean isSquadNumberPresentAt(Signing signing);
+    Signing createSigning(Signing signing);
 }

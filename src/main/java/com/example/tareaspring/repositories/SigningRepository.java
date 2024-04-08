@@ -10,18 +10,13 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface SigningRepository extends JpaRepository<Signing, Long> {
 
     List<Signing> findByPlayer(Player player);
     List<Signing> findByTeam(Team team);
-    List<Signing> findByTeamAndPlayer(Team team, Player player);
-    List<Signing> findByUntil(LocalDate date);
-    List<Signing> findBySince(LocalDate date);
-    List<Signing> findBySquadNumberAndUntil(Integer squadNumber, LocalDate date);
-    @Query("SELECT t FROM Team t WHERE t.id = :id")
-    Team findByTeamWithId(@Param("id")Long id);
-    @Query("SELECT p FROM Player p WHERE p.id = :id")
-    Player findByPlayerWithId(@Param("id")Long id);
+    Optional<Team> findByTeamId(Long id);
+    Optional<Player> findByPlayerId(Long id);
 }

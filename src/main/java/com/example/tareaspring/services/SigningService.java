@@ -5,12 +5,13 @@ import com.example.tareaspring.models.Signing;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface SigningService {
 
     List<Signing> parseCSVFileToSignings(MultipartFile file);
     List<Signing> findAll();
-    Signing findById(Long id);
+    Optional<Signing> findById(Long id);
     Signing create(Signing Signing);
     Signing update(Signing Signing);
     public Boolean deleteById(Long id);

@@ -35,7 +35,6 @@ public class PlayerController {
      */
     @GetMapping
     public ResponseEntity<List<Player>> findAll() {
-
         return ResponseEntity.ok(service.findAll());
     }
 

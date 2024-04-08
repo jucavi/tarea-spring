@@ -1,15 +1,16 @@
 package com.example.tareaspring.services;
 
 import com.example.tareaspring.dto.SigningCSV;
+import com.example.tareaspring.errors.*;
 import com.example.tareaspring.models.Player;
 import com.example.tareaspring.models.Signing;
 import com.example.tareaspring.models.Team;
 import com.example.tareaspring.repositories.SigningRepository;
 import com.example.tareaspring.utils.parsers.CSVParser;
 
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -27,6 +28,8 @@ import java.util.Optional;
 public class SigningServiceImp implements SigningService {
 
     private final SigningRepository repository;
+    private final PlayerService playerService;
+    private final TeamService teamService;
 
 
     @Override
@@ -35,104 +38,87 @@ public class SigningServiceImp implements SigningService {
         return repository.findAll();
     }
 
-    @Override
-    public Signing findById(Long id) {
-        Optional<Signing> signingOpt = repository.findById(id);
 
-        if (signingOpt.isPresent()) {
-            log.info("Retrieving Signing with ID: {}", id);
-            return signingOpt.get();
-        }
-        log.warn("Trying to retrieve Signing with wrong ID: {}", id);
-        return null;
+    @Override
+    public Optional<Signing> findById(Long id) {
+        log.info("Retrieving signing with ID: {}", id);
+        return repository.findById(id);
     }
 
-    /*
-    TODO:
-        First: need a valid until date
-        Second: check for squad number
-        If Signing at current date is signed, then
-            if it is same team and 'until date' is grater than actual Signing 'until date', then
-                * (extend signing)
-                    * Check for squad number
-                    * Update 'until date' with new 'until date'
-                * Write logs
-            if it is not the same team and 'until date' is greater than current date, then
-                * (new signing)
-                    * if 'since date' is before or equal current date and new 'until date' is after current date
-                        * Check for squad number
-                        * Close current signing 'until date' with current date and update 'since date' to current date to the new signing
-                    * if since date is a after de current date and new 'until date' is after current date
-                        * Check for squad number
-                        * keep all data
-        If Signing at current date is not signed, persist
-    */
+
+    /**
+     * Create a signing
+     */
     @Override
     public Signing create(Signing signing) {
 
-        // Only new Signings available
+        //return repository.save(signing);
         if (signing.getId() != null) {
-            // maybe trow exception message to catch in controller
-            log.warn("Trying to create a Signing with assigned ID: {}", signing.getId());
-            return null;
+            throw new CreateEntityException("Trying to create a signing, but ID not null");
         }
 
-        if (!isValidSigning(signing)) {
-            return null;
-        }
-
-        List<Signing> SigningSignings = repository.findByPlayer(signing.getPlayer());
-        Signing currentSigning = findCurrentSigningSigning(SigningSignings);
-
-        // If Signing where not signings or at current date are not signed
-        if (SigningSignings.isEmpty() || currentSigning == null) {
-            if (isValidSquadNumber(signing)) {
-                Signing result = repository.save(signing);
-                log.info("Created signing with ID: {}", result.getId() );
-                return result;
-            } else {
-                log.warn("Trying to create a signing with squad number");
-                return null;
+        if (isValidSigning(signing)) {
+            try {
+                repository.save(signing);
+            } catch (Exception ex) {
+                throw new DatabaseSaveException("Unable to create in database: " + signing);
             }
+            return signing;
         }
 
-        // if signing on a same team
-        boolean isSigningModification = currentSigning.getTeam().equals(signing.getTeam());
-
-        // Signing with existing contract
-        if (isSigningModification) {
-            // Update data with new signing values keeping since date
-            signing.setId(currentSigning.getId());
-            signing.setSince(currentSigning.getSince());
-
-            Signing result = repository.save(signing);
-            log.info("Updated signing with ID: {}", result.getId());
-
-            return result;
-        } else {
-
-            boolean isNewSigningWithContractInForce = currentSigning.getUntil().isBefore(signing.getSince());
-
-            if (isNewSigningWithContractInForce) {
-                currentSigning.setUntil(signing.getSince());
-                // Modify current contract
-                log.info("Updated contract in force with ID: {}, due new contract ", currentSigning.getId());
-                repository.save(currentSigning);
-            }
-        }
-
-        Signing result = repository.save(signing);
-        log.info("Created signing with ID: {}", result.getId() );
-
-        return result;
+        throw new ValidSigningException("Unable to create invalid signing in database: " + signing);
     }
 
+
+    /**
+     * Update signing
+     */
     @Override
-    public Signing update(Signing Signing) {
-        throw new RuntimeException("Not implemented");
+    public Signing update(Signing signing) {
+
+        if (signing.getId() == null) {
+            throw new CreateEntityException("Error, trying to update signing with ID: null");
+        }
+
+        // id's cant be changed
+        // the player have contract and a number
+
+        // number can be change if not present if newNumber != new number check
+        // can modify a contract if lo permiten los restantes del jugador
+
+        if (isValidSigning(signing)) {
+            try {
+                repository.save(signing);
+            } catch (Exception ex) {
+                throw new DatabaseSaveException("Unable to create in database: " + signing);
+            }
+            return signing;
+        }
+
+        throw new ValidSigningException("Unable to create invalid signing in database: " + signing);
+    }
+
+    /**
+     * Delete Signing by id
+     */
+    @Override
+    public Boolean deleteById(Long id) {
+
+        if (repository.existsById(id)) {
+            repository.deleteById(id);
+            log.info("Signing deleted with ID: {}", id);
+            return true;
+        }
+
+        log.warn("Trying to delete a Signing with wrong ID");
+        return false;
     }
 
 
+    /**
+     * Parse csv file to DAO
+     */
+    @Override
     public List<Signing> parseCSVFileToSignings(@NonNull MultipartFile file) {
 
         List<Signing> signings = new ArrayList<>();
@@ -142,6 +128,14 @@ public class SigningServiceImp implements SigningService {
             result.forEach((signingCsv -> {
                 try {
                     Signing signing = signingCsv.mapToDao();
+                    Long id = signing.getId();
+
+                    // Si el csv viene con id sobreescribe
+                    if (id == null) {
+                        create(signing);
+                    } else  {
+                        update(signing);
+                    }
 
                     repository.save(signing);
                     signings.add(signing);
@@ -158,100 +152,120 @@ public class SigningServiceImp implements SigningService {
     }
 
     /**
-     * Check if signing contains valid data
-     * @param signing signing
-     * @return {@code true} if is valid, {@code false} otherwise
+     * Check if signing contains valid info
      */
-    private boolean isValidSigning(Signing signing) {
-        LocalDate today = LocalDate.now();
-        LocalDate until = signing.getUntil();
+    private Boolean isValidSigning(@NonNull Signing signing) {
+
+        Long playerId = signing.getPlayer().getId();
+        Long teamId = signing.getTeam().getId();
         LocalDate since = signing.getSince();
+        LocalDate until = signing.getUntil();
+        Integer squadNumber = signing.getSquadNumber();
 
-        // needed because properties of those objects send in request are null
-        Team team = repository.findByTeamWithId(signing.getTeam().getId());
-        Player player = repository.findByPlayerWithId(signing.getPlayer().getId());
-
-        // fk needed, need some kind of validation in form
-        if (team == null || player == null) {
-            log.warn("Trying to create a Signing with non available team or Signing");
-            return false;
-        }
-
-        // Signings with invalid expiration date
-        if (until != null && until.isBefore(today)) {
-            log.warn("Trying to create a Signing with invalid expiring date: {}", until);
-            return false;
-        }
-
-        if (until == null || since.isBefore(until)) {
-            return true;
-        }
-
-        log.warn("Invalid range of dates");
-        return false;
+        return isValidSquadNumberAt(teamId, squadNumber, since, until)
+                && isPlayerNotSignedAt(playerId, since, until);
     }
 
-
     /**
-     * Check if the squad number of a Signing do not exist un current signings
-     * @return {@code true} if squad number is valid, {@code false} otherwise
+     * Check if player haven't signed in that date range (since, until)
+     * {@code true} if player has no contract, otherwise {@code false}
      */
-    private boolean isValidSquadNumber(Signing signing) {
-        // Check nullable team before
-        List<Signing> teamSignings = repository.findByTeam(signing.getTeam());
+    private Boolean isPlayerNotSignedAt(
+            @NonNull Long playerId,
+            @NonNull LocalDate since,
+            @NonNull LocalDate until) {
 
-        for (Signing s : teamSignings) {
-            boolean isSameSigning = s.getPlayer().equals(signing.getPlayer());
+        Optional<Player> playerOpt = playerService.findById(playerId);
 
-            if (isSigningActive(s) && !isSameSigning) {
-                if (s.getSquadNumber().equals(signing.getSquadNumber())) {
-                    return false;
-                }
+        if (playerOpt.isEmpty()) {
+            throw new PlayerNotFoundException(playerId);
+        }
+
+        List<Signing> signings = playerOpt.get().getSignings();
+
+        for (Signing s : signings) {
+            LocalDate currentSince = s.getSince();
+            LocalDate currentUntil = s.getUntil();
+
+            boolean isSinceDateIn = isDateInRangeInclusive(currentSince, currentUntil, since);
+            boolean isUntilDateIn = isDateInRangeInclusive(currentSince, currentUntil, until);
+            boolean isBiggerRange = isDateRangeSubset(currentSince, currentUntil, since, until);
+
+            if (isSinceDateIn || isUntilDateIn || isBiggerRange) {
+                log.warn("Player can't sign due to current contract");
+                return false;
             }
         }
+
         return true;
     }
 
     /**
-     * Signing with contract in force
-     * <p>Not future signing are considered</p>
-     * @param signing signing
-     * @return {@code true} if Signing has contract in force, {@code false} otherwise
+     * Check if squad number are taken on any signing for that date range (since, until)
+     * {@code true} if squad number hasn't taken by any player, otherwise {@code false}
      */
-    private boolean isSigningActive(Signing signing) {
-        LocalDate today = LocalDate.now();
-        LocalDate until = signing.getUntil();
+    private boolean isValidSquadNumberAt(
+            @NonNull Long teamId,
+            @NonNull Integer squadNumber,
+            @NonNull LocalDate since,
+            @NonNull LocalDate until) {
 
-        // signing expiration should be after current date
-        // inclusive signing ending? if true || until.isEqual(today)
-        return until == null || until.isAfter(today);
+        Optional<Team> teamOpt = teamService.findById(teamId);
+
+        if (teamOpt.isEmpty()) {
+            throw new TeamNotFoundException(teamId);
+        }
+
+        List<Signing> signings = teamOpt.get().getSignings();
+
+        // user can be signed by team, but active signing and isPlayerNotSignedAt -> false
+        for (Signing s : signings) {
+
+            LocalDate currentSince = s.getSince();
+            LocalDate currentUntil = s.getUntil();
+
+            // if date in any contract check squad number
+            boolean isSinceDateIn = isDateInRangeInclusive(currentSince, currentUntil, since);
+            boolean isUntilDateIn = isDateInRangeInclusive(currentSince, currentUntil, until);
+            boolean isBiggerRange = isDateRangeSubset(currentSince, currentUntil, since, until);
+
+            if (isSinceDateIn || isUntilDateIn || isBiggerRange) {
+
+                // if squad number already taken -> false
+                if (s.getSquadNumber().equals(squadNumber)) {
+                    log.warn("Squad number already taken: " + squadNumber);
+                    return false;
+                }
+            }
+        }
+
+        return true;
     }
 
     /**
-     * Find the current signing of a Signing
-     * @param SigningSignings list of Signing signings
-     * @return a current signing if exists, else {@code null}
+     * check if date is in range [startDate, endDate]
      */
-    private Signing findCurrentSigningSigning(List<Signing> SigningSignings) {
+    private boolean isDateInRangeInclusive(
+            @NonNull LocalDate startDate,
+            @NonNull LocalDate endDate,
+            @NonNull LocalDate date) {
 
-        for (Signing signing : SigningSignings) {
-            if (isSigningActive(signing)) {
-                return signing;
-            }
-        }
-        return null;
+        // if date between [startDate, endDate]
+        return (startDate.isBefore(date) || startDate.isEqual(date))
+                && (endDate.isAfter(date) || endDate.isEqual(date));
     }
 
-    @Override
-    public Boolean deleteById(Long id) {
+    /**
+     * check if [starDate, endDate] is included in [since, until]
+     */
+    private boolean isDateRangeSubset(
+            @NonNull LocalDate startDate,
+            @NonNull LocalDate endDate,
+            @NonNull LocalDate since,
+            @NonNull LocalDate until) {
 
-        if (repository.existsById(id)) {
-            repository.deleteById(id);
-            log.info("Signing deleted with ID: {}", id);
-            return true;
-        }
-
-        log.warn("Trying to delete a Signing with wrong ID");
-        return false;
+        // if both edges in [since, until] is at least a subset
+        return isDateInRangeInclusive(since, until, startDate)
+                && isDateInRangeInclusive(since, until, endDate);
     }
 }

@@ -20,5 +20,4 @@ public interface PlayerService {
     List<PlayerTeamsResponseDto> getUserSignings(Long id);
     List<Team> getUserSigningsTeams(Long id);
     List<PlayerTeamsResponseDto> getUserSigningAtDate(Long id, LocalDate date);
-    Boolean isUserSignedAt(Long id, LocalDate date);
 }

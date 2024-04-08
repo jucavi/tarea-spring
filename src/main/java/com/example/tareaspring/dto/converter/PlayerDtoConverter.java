@@ -13,6 +13,7 @@ public class PlayerDtoConverter {
     private final ModelMapper modelMapper;
 
     public PlayerDto convertEntityToDto(Player player) {
+
         return modelMapper.map(player, PlayerDto.class);
     }
 

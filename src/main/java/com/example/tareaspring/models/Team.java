@@ -15,6 +15,9 @@ import java.util.List;
 @NoArgsConstructor
 @Builder
 @Entity
+@Table(uniqueConstraints={
+        @UniqueConstraint( name = "idx_name_city",  columnNames ={"name","city"})
+})
 public class Team {
 
     @Id
@@ -36,6 +39,14 @@ public class Team {
     @JsonIgnore
     @OneToMany(mappedBy = "team", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
     List<Signing> signings = new ArrayList<>();
+
+    public Team(Long id, String name, String email, LocalDate since, String city) {
+        this.id = id;
+        this.name = name;
+        this.email = email;
+        this.since = since;
+        this.city = city;
+    }
 
     @Override
     public String toString() {

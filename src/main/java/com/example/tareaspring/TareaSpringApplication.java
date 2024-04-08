@@ -5,6 +5,9 @@ import com.example.tareaspring.models.*;
 import com.example.tareaspring.repositories.PlayerRepository;
 import com.example.tareaspring.repositories.SigningRepository;
 import com.example.tareaspring.repositories.TeamRepository;
+import com.example.tareaspring.services.PlayerService;
+import com.example.tareaspring.services.SigningService;
+import com.example.tareaspring.services.TeamService;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ApplicationContext;
@@ -20,54 +23,125 @@ public class TareaSpringApplication {
 
 		LocalDate since = LocalDate.of(2000, 2, 13);
 
-		PlayerRepository playerRep = context.getBean(PlayerRepository.class);
-		TeamRepository teamRep = context.getBean(TeamRepository.class);
-		SigningRepository signRep = context.getBean(SigningRepository.class);
+		PlayerService playerS = context.getBean(PlayerService.class);
+		TeamService teamS = context.getBean(TeamService.class);
+		SigningService signS = context.getBean(SigningService.class);
 
 
 		// crear un jugador y almacenar
-		Player player = new Player(null, "player", "one", "email@email.es", since, FieldPosition.Defensa, Gender.Mujer, 67, 178, 7);
-		// month with octal value
-		//Player player1 = new Player(1L,"Adelle","Fiester","Adelle.Fiester@player.com", LocalDate.of(1993, 4, 29), FieldPosition.Defensa,Gender.Hombre,64,166,33.6,8);
-		System.out.println("Número de jugadores en la base de datos: " + playerRep.findAll().size());
-		playerRep.save(player);
-		//playerRep.save(player1);
-		System.out.println("Número de jugadores en la base de datos: " + playerRep.findAll().size());
-		System.out.printf("Imc: %,.6f%n", player.getImc());
-		player.setHigh(200);
-		player.setWeight(50);
-		System.out.printf("Imc: %,.6f%n", player.getImc());
+		Player player1 = new Player(
+				null,
+				"player1",
+				"one",
+				"email1@email.es",
+				LocalDate.now(),
+				FieldPosition.Defensa,
+				Gender.Mujer,
+				67,
+				178,
+				7);
+		Player player2 = new Player(
+				null,
+				"Adelle",
+				"Fiester",
+				"Adelle.Fiester@player.com",
+				LocalDate.of(1993, 4, 29),
+				FieldPosition.Defensa,
+				Gender.Hombre,
+				64,
+				166,
+				33.6,
+				8);
 
-		// Crear un equipo y almacenar
-		Team team1 = new Team(null, "team1", "team1email@email.es", since, "Santander", null);
-		Team team2 = new Team(null, "team2", "team2email@email.es", since, "Santander", null);
-		System.out.println("Número de equipos en la base de datos: " + teamRep.findAll().size());
-		teamRep.save(team1);
-		teamRep.save(team2);
-		System.out.println("Número de equipos en la base de datos: " + teamRep.findAll().size());
-
-		Optional<Player> op1 = playerRep.findById(1L);
-		Optional<Team> ot1 = teamRep.findById(1L);
-		Optional<Team> ot2 = teamRep.findById(2L);
+		playerS.create(player1);
+		playerS.create(player2);
 
 
-		Signing signing1 = new Signing(null, op1.get(), ot1.get(),
-				LocalDate.of(2000, 1, 23),
-				LocalDate.of(2000, 6, 13),
-				66);
-		Signing signing2 = new Signing(null, op1.get(), ot1.get(),
-				LocalDate.of(2010, 1, 23),
-				LocalDate.of(2020, 6, 13),
-				66);
-		Signing signing3 = new Signing(null, op1.get(), ot1.get(),
-				LocalDate.of(2000, 5, 1),
-				LocalDate.of(2000, 6, 18),
-				66);
-		System.out.println("Número de joining data en la base de datos: " + signRep.findAll().size());
-		signRep.save(signing1);
-		signRep.save(signing2);
-		signRep.save(signing3);
-		System.out.println("Número de joining data en la base de datos: " + signRep.findAll().size());
+		System.out.println("Number of players in database: " + playerS.findAll().size());
+
+
+
+		Team team1 = new Team(
+				null,
+				"team1",
+				"team1email@email.es",
+				since,
+				"Santander",
+				null);
+
+		Team team2 = new Team(
+				null,
+				"team2",
+				"team2email@email.es",
+				since,
+				"Madrid",
+				null);
+
+		teamS.create(team1);
+		teamS.create(team2);
+		System.out.println("Number of teams in database: " + teamS.findAll().size());
+
+		Optional<Player> p1 = playerS.findById(1L);
+		Optional<Player> p2 = playerS.findById(2L);
+
+		Optional<Team> t1 = teamS.findById(1L);
+		Optional<Team> t2 = teamS.findById(2L);
+
+
+//		Signing signing1 = new Signing(
+//				null,
+//				p1.get(),
+//				t1.get(),
+//				LocalDate.of(2000, 1, 1),
+//				LocalDate.of(2000, 6, 1),
+//				66);
+//
+//		// player with signing on different team invalid
+//		Signing signing2 = new Signing(
+//				null,
+//				p1.get(),
+//				t2.get(),
+//				LocalDate.of(2000, 2, 23),
+//				LocalDate.of(2000, 7, 13),
+//				55);
+//
+//		// player with signing on same team invalid
+//		Signing signing3 = new Signing(
+//				null,
+//				p1.get(),
+//				t1.get(),
+//				LocalDate.of(2000, 2, 23),
+//				LocalDate.of(2000, 7, 13),
+//				55);
+//
+//		// player with valid range but no number invalid
+//		Signing signing4 = new Signing(
+//				null,
+//				p2.get(),
+//				t1.get(),
+//				LocalDate.of(2000, 1, 1),
+//				LocalDate.of(2000, 6, 18),
+//				66);
+//
+//		// valid number
+//		Signing signing5 = new Signing(
+//				null,
+//				p2.get(),
+//				t1.get(),
+//				LocalDate.of(2000, 1, 1),
+//				LocalDate.of(2000, 6, 18),
+//				55);
+//
+//
+//
+//		signS.create(signing1);
+//		signS.create(signing2);
+//		signS.create(signing3);
+//		signS.create(signing4);
+//		signS.create(signing5);
+
+
+		System.out.println("Signings on database: " + signS.findAll().size());
 	}
 
 }

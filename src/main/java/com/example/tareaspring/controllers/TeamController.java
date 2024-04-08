@@ -126,12 +126,11 @@ public class TeamController {
      */
     // TODO
     @PostMapping("/{id}/signings/players/{playerId}/create")
-    public ResponseEntity<Signing> createSigning(@RequestBody SigningDto signingDto) {
+    public ResponseEntity<Signing> createSigning(
+            @RequestBody @Valid SigningDto signingDto,
+            @PathVariable Long id,
+            @PathVariable Long playerId) {
 
-//        return ResponseEntity.ok(
-//                service.createSigning(modelMapper.map(signingDto, Signing.class))
-//        );
-        System.out.println(signingDto);
         return ResponseEntity.ok(modelMapper.map(signingDto, Signing.class));
     }
 

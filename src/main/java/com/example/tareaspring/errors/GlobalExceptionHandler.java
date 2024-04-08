@@ -74,7 +74,8 @@ public class GlobalExceptionHandler {
     @ExceptionHandler({
             CreateEntityException.class,
             MissingServletRequestParameterException.class,
-            DataIntegrityViolationException.class
+            DataIntegrityViolationException.class,
+            DatabaseSaveException.class
     })
     public ResponseEntity<ApiError> handleDateFormatException(Exception ex) {
 
@@ -82,7 +83,7 @@ public class GlobalExceptionHandler {
         log.error(message);
 
         Map<String, String> errors = new HashMap<>();
-        errors.put("entity", message);
+        errors.put("system", message);
 
         return ResponseEntity.unprocessableEntity().body(new ApiError(
                 HttpStatus.INTERNAL_SERVER_ERROR,
@@ -94,7 +95,8 @@ public class GlobalExceptionHandler {
     @ExceptionHandler({
             DataFormatException.class,
             InvalidFormatException.class,
-            HttpMessageNotReadableException.class
+            HttpMessageNotReadableException.class,
+            ValidSigningException.class
     })
     public ResponseEntity<ApiError> handleCreateEntityException(Exception ex) {
 
@@ -110,16 +112,4 @@ public class GlobalExceptionHandler {
                 errors
         ));
     }
-
-//    @ExceptionHandler(Exception.class)
-//    public ResponseEntity<Map<String, String>> handleException(Exception ex, WebRequest request) {
-//
-//        log.error(ex.getMessage());
-//
-//        Map<String, String> errors = new HashMap<>();
-//        errors.put("field ", ex.getMessage());
-//
-//        return ResponseEntity.unprocessableEntity().body(errors);
-//    }
-
 }
