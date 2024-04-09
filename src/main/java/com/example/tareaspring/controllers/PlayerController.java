@@ -35,7 +35,7 @@ public class PlayerController {
      * Get all players from database
      */
     @GetMapping
-    public ResponseEntity<List<Player>> findAll() {
+    public ResponseEntity<List<PlayerDto>> findAll() {
         return ResponseEntity.ok(service.findAll());
     }
 
@@ -44,7 +44,7 @@ public class PlayerController {
      * Find a player from database
      */
     @GetMapping("/{id}")
-    public ResponseEntity<Player> findById(@PathVariable Long id) {
+    public ResponseEntity<PlayerDto> findById(@PathVariable Long id) {
         return service.findById(id)
                 .map(ResponseEntity::ok)
                 .orElseThrow(() -> new PlayerNotFoundException(id));
@@ -55,9 +55,9 @@ public class PlayerController {
      * Create a player in the database
      */
     @PostMapping
-    public ResponseEntity<Player> create(@RequestBody @Valid PlayerDto playerDto) {
+    public ResponseEntity<PlayerDto> create(@RequestBody @Valid PlayerDto playerDto) {
         return ResponseEntity.ok(
-                service.create(playerMapper.mapDtoToDao(playerDto))
+                service.create(playerDto)
         );
     }
 
@@ -66,9 +66,9 @@ public class PlayerController {
      * Update player info
      */
     @PutMapping
-    public ResponseEntity<Player> update(@RequestBody @Valid  PlayerDto playerDto) {
+    public ResponseEntity<PlayerDto> update(@RequestBody @Valid  PlayerDto playerDto) {
         return ResponseEntity.ok(
-            service.update(playerMapper.mapDtoToDao(playerDto))
+            service.update(playerDto)
         );
     }
 
@@ -123,8 +123,8 @@ public class PlayerController {
      * Persist registries from csv file into database
      */
     @PostMapping("/upload")
-    public ResponseEntity<List<Player>> upload(@RequestParam("file") MultipartFile file) {
-        List<Player> result =  service.parseCSVFileToPlayers(file);
+    public ResponseEntity<List<PlayerDto>> upload(@RequestParam("file") MultipartFile file) {
+        List<PlayerDto> result =  service.parseCSVFileToPlayers(file);
 
         return ResponseEntity.ok(result);
     }

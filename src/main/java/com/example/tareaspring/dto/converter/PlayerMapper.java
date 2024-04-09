@@ -8,6 +8,7 @@ import com.example.tareaspring.utils.DateUtils;
 import org.springframework.stereotype.Component;
 
 // What's difference between @Component or create a @Bean
+
 public class PlayerMapper implements MapperInterface<Player, PlayerDto> {
 
     @Override

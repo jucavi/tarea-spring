@@ -1,6 +1,8 @@
 package com.example.tareaspring.services;
 
+import com.example.tareaspring.dto.PlayerDto;
 import com.example.tareaspring.dto.SigningCSV;
+import com.example.tareaspring.dto.converter.PlayerMapper;
 import com.example.tareaspring.errors.*;
 import com.example.tareaspring.models.Player;
 import com.example.tareaspring.models.Signing;
@@ -30,6 +32,7 @@ public class SigningServiceImp implements SigningService {
     private final SigningRepository repository;
     private final PlayerService playerService;
     private final TeamService teamService;
+    private final PlayerMapper playerMapper;
 
 
     @Override
@@ -224,13 +227,15 @@ public class SigningServiceImp implements SigningService {
             @NonNull LocalDate since,
             @NonNull LocalDate until) {
 
-        Optional<Player> playerOpt = playerService.findById(playerId);
+        Optional<PlayerDto> playerOpt = playerService.findById(playerId);
 
         if (playerOpt.isEmpty()) {
             throw new PlayerNotFoundException(playerId);
         }
 
-        List<Signing> signings = playerOpt.get().getSignings();
+        Player player = playerMapper.mapDtoToDao(playerOpt.get());
+
+        List<Signing> signings = player.getSignings();
 
         for (Signing s : signings) {
             LocalDate currentSince = s.getSince();
@@ -341,13 +346,14 @@ public class SigningServiceImp implements SigningService {
             @NonNull LocalDate since,
             @NonNull LocalDate until) {
 
-        Optional<Player> playerOpt = playerService.findById(playerId);
+        Optional<PlayerDto> playerOpt = playerService.findById(playerId);
 
         if (playerOpt.isEmpty()) {
             throw new PlayerNotFoundException(playerId);
         }
 
-        List<Signing> signings = playerOpt.get().getSignings();
+        Player player = playerMapper.mapDtoToDao(playerOpt.get());
+        List<Signing> signings = player.getSignings();
 
         for (Signing s : signings) {
             LocalDate currentSince = s.getSince();

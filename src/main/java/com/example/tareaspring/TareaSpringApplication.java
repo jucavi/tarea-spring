@@ -27,65 +27,65 @@ public class TareaSpringApplication {
 		TeamService teamS = context.getBean(TeamService.class);
 		SigningService signS = context.getBean(SigningService.class);
 
-
-		// crear un jugador y almacenar
-		Player player1 = new Player(
-				null,
-				"player1",
-				"one",
-				"email1@email.es",
-				LocalDate.now(),
-				FieldPosition.Defensa,
-				Gender.Mujer,
-				67,
-				178,
-				7);
-		Player player2 = new Player(
-				null,
-				"Adelle",
-				"Fiester",
-				"Adelle.Fiester@player.com",
-				LocalDate.of(1993, 4, 29),
-				FieldPosition.Defensa,
-				Gender.Hombre,
-				64,
-				166,
-				33.6,
-				8);
-
-		playerS.create(player1);
-		playerS.create(player2);
-
-
-		System.out.println("Number of players in database: " + playerS.findAll().size());
-
-
-
-		Team team1 = new Team(
-				null,
-				"team1",
-				"team1email@email.es",
-				since,
-				"Santander",
-				null);
-
-		Team team2 = new Team(
-				null,
-				"team2",
-				"team2email@email.es",
-				since,
-				"Madrid",
-				null);
-
-		teamS.create(team1);
-		teamS.create(team2);
-		System.out.println("Number of teams in database: " + teamS.findAll().size());
-
-		Optional<Player> p1 = playerS.findById(1L);
-		Optional<Player> p2 = playerS.findById(2L);
-
-		Optional<Team> t1 = teamS.findById(1L);
-		Optional<Team> t2 = teamS.findById(2L);
+//
+//		// crear un jugador y almacenar
+//		Player player1 = new Player(
+//				null,
+//				"player1",
+//				"one",
+//				"email1@email.es",
+//				LocalDate.now(),
+//				FieldPosition.Defensa,
+//				Gender.Mujer,
+//				67,
+//				178,
+//				7);
+//		Player player2 = new Player(
+//				null,
+//				"Adelle",
+//				"Fiester",
+//				"Adelle.Fiester@player.com",
+//				LocalDate.of(1993, 4, 29),
+//				FieldPosition.Defensa,
+//				Gender.Hombre,
+//				64,
+//				166,
+//				33.6,
+//				8);
+//
+//		playerS.create(player1);
+//		playerS.create(player2);
+//
+//
+//		System.out.println("Number of players in database: " + playerS.findAll().size());
+//
+//
+//
+//		Team team1 = new Team(
+//				null,
+//				"team1",
+//				"team1email@email.es",
+//				since,
+//				"Santander",
+//				null);
+//
+//		Team team2 = new Team(
+//				null,
+//				"team2",
+//				"team2email@email.es",
+//				since,
+//				"Madrid",
+//				null);
+//
+//		teamS.create(team1);
+//		teamS.create(team2);
+//		System.out.println("Number of teams in database: " + teamS.findAll().size());
+//
+//		Optional<Player> p1 = playerS.findById(1L);
+//		Optional<Player> p2 = playerS.findById(2L);
+//
+//		Optional<Team> t1 = teamS.findById(1L);
+//		Optional<Team> t2 = teamS.findById(2L);
 
 
 //		Signing signing1 = new Signing(

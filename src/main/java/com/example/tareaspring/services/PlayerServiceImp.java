@@ -1,12 +1,12 @@
 package com.example.tareaspring.services;
 
+import com.example.tareaspring.dto.PlayerDto;
 import com.example.tareaspring.dto.PlayerTeamsResponseDto;
+import com.example.tareaspring.dto.converter.PlayerMapper;
 import com.example.tareaspring.errors.CreateEntityException;
 import com.example.tareaspring.errors.DatabaseSaveException;
 import com.example.tareaspring.errors.PlayerNotFoundException;
-import com.example.tareaspring.models.FieldPosition;
 import com.example.tareaspring.models.Player;
-import com.example.tareaspring.dto.PlayerCSV;
 import com.example.tareaspring.models.Signing;
 import com.example.tareaspring.models.Team;
 import com.example.tareaspring.repositories.PlayerRepository;
@@ -15,7 +15,6 @@ import com.example.tareaspring.utils.parsers.CSVParser;
 import com.example.tareaspring.utils.validators.utils.DateUtilsValidator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import org.modelmapper.ModelMapper;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -29,12 +28,14 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+// TODO: Modify to send custom response ??? PlayerResponseDto ???
 @Log4j2
 @RequiredArgsConstructor
 @Service
 public class PlayerServiceImp implements PlayerService {
 
     private final PlayerRepository repository;
+    private final PlayerMapper playerMapper;
 
 
     /**
@@ -42,40 +43,46 @@ public class PlayerServiceImp implements PlayerService {
      * @return list of players in the database
      */
     @Override
-    public List<Player> findAll() {
+    public List<PlayerDto> findAll() {
         log.info("Retrieving all players from database");
-        return repository.findAll();
+        return repository.findAll()
+                .stream()
+                .map(playerMapper::mapDaoToDto)
+                .collect(Collectors.toList());
     }
 
     /**
      * Find player by ID
      */
     @Override
-    public Optional<Player> findById(Long id) {
+    public Optional<PlayerDto> findById(Long id) {
         log.info("Retrieving player with ID: {}", id);
-        return repository.findById(id);
+        return repository.findById(id)
+                .map(playerMapper::mapDaoToDto);
     }
 
     /**
      * Create player in database
      */
     @Override
-    public Player create(Player player) {
+    public PlayerDto create(PlayerDto playerDto) {
 
-        if (player.getId() != null) {
+        if (playerDto.getId() != null) {
             throw new CreateEntityException("Trying to create a player, but ID not null");
         }
 
+        Player player;
         try {
-            Player result = repository.save(player);
+             player = repository.save(
+                    playerMapper.mapDtoToDao(playerDto));
 
             log.info("Player created with ID: {}", player.getId());
-            return result;
 
         } catch (Exception ex) {
             log.error(ex.getMessage());
             throw new DatabaseSaveException("Unable to create Player");
         }
+        return playerMapper.mapDaoToDto(player);
     }
 
 
@@ -83,36 +90,27 @@ public class PlayerServiceImp implements PlayerService {
      * Update player in database
      */
     @Override
-    public Player update(Player player) {
+    public PlayerDto update(PlayerDto playerDto) {
 
-        if (player.getId() == null) {
+        if (playerDto.getId() == null) {
             throw new CreateEntityException("Error, trying to update player with ID: null");
         }
 
-        Long id = player.getId();
+        Long id = playerDto.getId();
+        Player player;
 
         try {
-            Player result = repository.save(
-                    new Player(
-                            id,
-                            player.getFirstname(),
-                            player.getLastname(),
-                            player.getEmail(),
-                            player.getBirthdate(),
-                            player.getPosition(),
-                            player.getGender(),
-                            player.getWeight(),
-                            player.getHigh(),
-                            player.getFat()) // imc calculated
+             player = repository.save(
+                     playerMapper.mapDtoToDao(playerDto)
             );
-
-            log.info("Player updated with ID: {} to {}", id, player);
-            return result;
+            log.info("Player updated with ID: {} to {}", id, playerDto);
 
         } catch (Exception ex) {
             log.error(ex.getMessage());
-            throw new DatabaseSaveException("Unable to update player: " + player);
+            throw new DatabaseSaveException("Unable to update player: " + playerDto);
         }
+
+        return playerMapper.mapDaoToDto(player);
     }
 
     /**
@@ -203,27 +201,27 @@ public class PlayerServiceImp implements PlayerService {
 
 
     @Override
-    public List<Player> parseCSVFileToPlayers(@NonNull MultipartFile file) {
+    public List<PlayerDto> parseCSVFileToPlayers(@NonNull MultipartFile file) {
 
-        List<Player> players = new ArrayList<>();
+        List<PlayerDto> result = new ArrayList<>();
         try (Reader reader = new BufferedReader(new InputStreamReader(file.getInputStream()))) {
 
-            List<PlayerCSV> result = CSVParser.parse(reader, PlayerCSV.class);
-            result.forEach(playerCSV -> {
+            List<PlayerDto> parseResult = CSVParser.parse(reader, PlayerDto.class);
+
+            parseResult.forEach(dto -> {
                 try {
-                    Player player = playerCSV.mapToDao();
-                    Long id = player.getId();
+                    Long id = dto.getId();
 
                     // Si el csv viene con id sobreescribe
                     if (id == null) {
-                        create(player);
+                        create(dto);
                     } else  {
-                        update(player);
+                        update(dto);
                     }
 
-                    players.add(player);
+                    result.add(dto);
                 } catch (Exception ex) {
-                    log.error("{} can't be stored in the database due to: \n\t{}", playerCSV, ex.getMessage());
+                    log.error("{} can't be stored in the database due to: \n\t{}", dto, ex.getMessage());
                 }
             });
 
@@ -231,6 +229,6 @@ public class PlayerServiceImp implements PlayerService {
             log.error("Unable to read csv file.");
         }
 
-        return players;
+        return result;
     }
 }

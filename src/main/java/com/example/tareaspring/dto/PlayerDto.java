@@ -63,8 +63,10 @@ public class PlayerDto {
     @Max(value = 300, message = "High should be lesser than 300 centimeters")
     private Integer high;
 
+    @CsvBindByName(required = true)
     private Double imc;
 
+    @CsvBindByName(required = true)
     @NotNull
     @Min(value = 3, message = "Fat should be greater than 3 percent")
     @Max(value = 40, message = "Fat should be lesser than 40 percent")

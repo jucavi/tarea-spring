@@ -1,5 +1,6 @@
 package com.example.tareaspring.services;
 
+import com.example.tareaspring.dto.PlayerDto;
 import com.example.tareaspring.dto.PlayerTeamsResponseDto;
 import com.example.tareaspring.models.Player;
 import com.example.tareaspring.models.Team;
@@ -11,11 +12,11 @@ import java.util.Optional;
 
 public interface PlayerService {
 
-    List<Player> parseCSVFileToPlayers(MultipartFile file);
-    List<Player> findAll();
-    Optional<Player> findById(Long id);
-    Player create(Player player);
-    Player update(Player player);
+    List<PlayerDto> parseCSVFileToPlayers(MultipartFile file);
+    List<PlayerDto> findAll();
+    Optional<PlayerDto> findById(Long id);
+    PlayerDto create(PlayerDto playerDto);
+    PlayerDto update(PlayerDto playerDto);
     void deleteById(Long id);
     List<PlayerTeamsResponseDto> getUserSignings(Long id);
     List<Team> getUserSigningsTeams(Long id);
