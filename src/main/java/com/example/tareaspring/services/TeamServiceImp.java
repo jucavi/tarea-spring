@@ -1,7 +1,11 @@
 package com.example.tareaspring.services;
 
+import com.example.tareaspring.dto.PlayerDto;
 import com.example.tareaspring.dto.TeamCSV;
+import com.example.tareaspring.dto.TeamDto;
 import com.example.tareaspring.dto.TeamPlayerResponseDto;
+import com.example.tareaspring.dto.converter.PlayerMapper;
+import com.example.tareaspring.dto.converter.TeamMapper;
 import com.example.tareaspring.errors.*;
 import com.example.tareaspring.models.Player;
 import com.example.tareaspring.models.Signing;
@@ -30,6 +34,8 @@ import java.util.stream.Collectors;
 public class TeamServiceImp implements TeamService {
 
     private final TeamRepository repository;
+    private final TeamMapper teamMapper;
+    private final PlayerMapper playerMapper;
 
 
     /**
@@ -37,9 +43,12 @@ public class TeamServiceImp implements TeamService {
      * @return list of teams in the database
      */
     @Override
-    public List<Team> findAll() {
+    public List<TeamDto> findAll() {
         log.info("Retrieving all Teams from database");
-        return repository.findAll();
+        return repository.findAll()
+                .stream()
+                .map(teamMapper::mapDaoToDto)
+                .collect(Collectors.toList());
     }
 
 
@@ -47,9 +56,10 @@ public class TeamServiceImp implements TeamService {
      * Find team by id
      */
     @Override
-    public Optional<Team> findById(Long id) {
+    public Optional<TeamDto> findById(Long id) {
         log.info("Retrieving team with ID: {}", id);
-        return repository.findById(id);
+        return repository.findById(id)
+                .map(teamMapper::mapDaoToDto);
     }
 
 
@@ -57,53 +67,50 @@ public class TeamServiceImp implements TeamService {
      * Create a team
      */
     @Override
-    public Team create(Team team) {
+    public TeamDto create(TeamDto teamDto) {
 
-        if (team.getId() != null) {
+        if (teamDto.getId() != null) {
             throw new CreateEntityException("Trying to create a team, but ID not null");
         }
 
+        Team team;
         try {
-            Team result = repository.save(team);
+            team = repository.save(
+                    teamMapper.mapDtoToDao(teamDto));
 
             log.info("Team created with ID: {}", team.getId());
-            return result;
 
         } catch (Exception ex) {
             log.error(ex.getMessage());
-            throw new DatabaseSaveException("Unable to create team");
+            throw new DatabaseSaveException("Unable to create a team");
         }
+
+        return teamMapper.mapDaoToDto(team);
     }
 
     /**
      * Update team in database
      */
     @Override
-    public Team update(Team team) {
+    public TeamDto update(TeamDto teamDto) {
 
-        if (team.getId() == null) {
+        if (teamDto.getId() == null) {
             throw new CreateEntityException("Error, trying to update team with ID: null");
         }
 
-        Long id = team.getId();
-
+        Team team;
         try {
-            Team result = repository.save(
-                    new Team(
-                            id,
-                            team.getName(),
-                            team.getEmail(),
-                            team.getSince(),
-                            team.getCity())
-            );
+             team = repository.save(
+                    teamMapper.mapDtoToDao(teamDto));
 
-            log.info("Team updated with ID: {} to {}", id, team);
-            return result;
+            log.info("Team updated with ID: {} to {}", team.getId(), team);
 
         } catch (Exception ex) {
             log.error(ex.getMessage());
-            throw new DatabaseSaveException("Unable to update player: " + team);
+            throw new DatabaseSaveException("Unable to update player: " + teamDto);
         }
+
+        return teamMapper.mapDaoToDto(team);
     }
 
     /**
@@ -149,7 +156,7 @@ public class TeamServiceImp implements TeamService {
      * All players signed by a team
      */
     @Override
-    public List<Player> getTeamSigningsPlayers(Long id) {
+    public List<PlayerDto> getTeamSigningsPlayers(Long id) {
 
         repository.findById(id)
                 .orElseThrow(() -> new TeamNotFoundException(id));
@@ -161,6 +168,7 @@ public class TeamServiceImp implements TeamService {
                 .getSignings()
                 .stream()
                 .map(Signing::getPlayer)
+                .map(playerMapper::mapDaoToDto)
                 .distinct()
                 .collect(Collectors.toList());
     }
@@ -198,30 +206,31 @@ public class TeamServiceImp implements TeamService {
 
 
     /**
-     * Parse data
+     * Populate database from csv file
+     * @param file file
+     * @return a list of elements persisted
      */
     @Override
-    public List<Team> parseCSVFileToTeams(@NonNull MultipartFile file) {
+    public List<TeamDto> parseCSVFileToTeams(@NonNull MultipartFile file) {
 
-        List<Team> teams = new ArrayList<>();
+        List<TeamDto> result = new ArrayList<>();
+
         try (Reader reader = new BufferedReader(new InputStreamReader(file.getInputStream()))) {
 
-            List<TeamCSV> result = CSVParser.parse(reader, TeamCSV.class);
-            result.forEach((teamCsv -> {
+            List<TeamDto> parseResult = CSVParser.parse(reader, TeamDto.class);
+            parseResult.forEach((dto -> {
                 try {
-                    Team team = teamCsv.mapToDao();
-                    Long id = team.getId();
+                    Long id = dto.getId();
 
                     // with id: then rewrite
                     if (id == null) {
-                        create(team);
+                        create(dto);
                     } else  {
-                        update(team);
+                        update(dto);
                     }
-
-                    teams.add(team);
+                    result.add(dto);
                 } catch (Exception ex) {
-                    log.error("{} can't be stored in the database due to: \n\t{}", teamCsv, ex.getMessage());
+                    log.error("{} can't be stored in the database due to: \n\t{}", dto, ex.getMessage());
                 }
             }));
 
@@ -229,6 +238,6 @@ public class TeamServiceImp implements TeamService {
             log.error("Unable to read csv file.");
         }
 
-        return teams;
+        return result;
     }
 }

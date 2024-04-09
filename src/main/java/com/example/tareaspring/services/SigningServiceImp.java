@@ -2,7 +2,9 @@ package com.example.tareaspring.services;
 
 import com.example.tareaspring.dto.PlayerDto;
 import com.example.tareaspring.dto.SigningCSV;
+import com.example.tareaspring.dto.TeamDto;
 import com.example.tareaspring.dto.converter.PlayerMapper;
+import com.example.tareaspring.dto.converter.TeamMapper;
 import com.example.tareaspring.errors.*;
 import com.example.tareaspring.models.Player;
 import com.example.tareaspring.models.Signing;
@@ -33,6 +35,7 @@ public class SigningServiceImp implements SigningService {
     private final PlayerService playerService;
     private final TeamService teamService;
     private final PlayerMapper playerMapper;
+    private final TeamMapper teamMapper;
 
 
     @Override
@@ -266,13 +269,15 @@ public class SigningServiceImp implements SigningService {
             @NonNull LocalDate since,
             @NonNull LocalDate until) {
 
-        Optional<Team> teamOpt = teamService.findById(teamId);
+        Optional<TeamDto> teamOpt = teamService.findById(teamId);
 
         if (teamOpt.isEmpty()) {
             throw new TeamNotFoundException(teamId);
         }
 
-        List<Signing> signings = teamOpt.get().getSignings();
+        Team team = teamMapper.mapDtoToDao(teamOpt.get());
+
+        List<Signing> signings = team.getSignings();
 
         // user can be signed by team, but active signing and isPlayerNotSignedAt -> false
         for (Signing s : signings) {

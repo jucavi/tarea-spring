@@ -1,5 +1,6 @@
 package com.example.tareaspring.controllers;
 
+import com.example.tareaspring.dto.PlayerDto;
 import com.example.tareaspring.dto.TeamDto;
 import com.example.tareaspring.dto.TeamPlayerResponseDto;
 import com.example.tareaspring.errors.DateFormatException;
@@ -25,15 +26,13 @@ import java.util.List;
 public class TeamController {
 
     private final TeamServiceImp service;
-    private final ModelMapper modelMapper;
 
 
     /**
      * Get all teams from database
      */
     @GetMapping
-    public ResponseEntity<List<Team>> findAll() {
-
+    public ResponseEntity<List<TeamDto>> findAll() {
         return ResponseEntity.ok(service.findAll());
     }
 
@@ -42,7 +41,7 @@ public class TeamController {
      * Find a team from database
      */
     @GetMapping("/{id}")
-    public ResponseEntity<Team> findById(@PathVariable Long id) {
+    public ResponseEntity<TeamDto> findById(@PathVariable Long id) {
         return service.findById(id)
                 .map(ResponseEntity::ok)
                 .orElseThrow(() -> new TeamNotFoundException(id));
@@ -53,9 +52,9 @@ public class TeamController {
      * Create a team in the database
      */
     @PostMapping
-    public ResponseEntity<Team> create(@RequestBody @Valid TeamDto teamDto) {
+    public ResponseEntity<TeamDto> create(@RequestBody @Valid TeamDto teamDto) {
         return ResponseEntity.ok(
-                service.create(modelMapper.map(teamDto, Team.class))
+                service.create(teamDto)
         );
     }
 
@@ -64,9 +63,9 @@ public class TeamController {
      * Update team info
      */
     @PutMapping
-    public ResponseEntity<Team> update(@RequestBody @Valid TeamDto teamDto) {
+    public ResponseEntity<TeamDto> update(@RequestBody @Valid TeamDto teamDto) {
         return ResponseEntity.ok(
-                service.update(modelMapper.map(teamDto, Team.class))
+                service.update(teamDto)
         );
     }
 
@@ -97,7 +96,7 @@ public class TeamController {
      * All players who have been signed by a team
      */
     @GetMapping("/{id}/signings/players/all")
-    public ResponseEntity<List<Player>> findTeasByPlayerId(@PathVariable Long id) {
+    public ResponseEntity<List<PlayerDto>> findTeasByPlayerId(@PathVariable Long id) {
 
         return ResponseEntity.ok(service.getTeamSigningsPlayers(id));
     }
@@ -126,8 +125,8 @@ public class TeamController {
      * @return List of teams persisted, otherwise an empty list
      */
     @PostMapping("/upload")
-    public ResponseEntity<List<Team>> upload(@RequestParam("file") MultipartFile file) {
-        List<Team> result =  service.parseCSVFileToTeams(file);
+    public ResponseEntity<List<TeamDto>> upload(@RequestParam("file") MultipartFile file) {
+        List<TeamDto> result =  service.parseCSVFileToTeams(file);
 
         return ResponseEntity.ok(result);
     }

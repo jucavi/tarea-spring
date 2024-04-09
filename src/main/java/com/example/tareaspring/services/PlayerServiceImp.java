@@ -80,7 +80,7 @@ public class PlayerServiceImp implements PlayerService {
 
         } catch (Exception ex) {
             log.error(ex.getMessage());
-            throw new DatabaseSaveException("Unable to create Player");
+            throw new DatabaseSaveException("Unable to create a player");
         }
         return playerMapper.mapDaoToDto(player);
     }
@@ -96,14 +96,12 @@ public class PlayerServiceImp implements PlayerService {
             throw new CreateEntityException("Error, trying to update player with ID: null");
         }
 
-        Long id = playerDto.getId();
         Player player;
-
         try {
              player = repository.save(
-                     playerMapper.mapDtoToDao(playerDto)
-            );
-            log.info("Player updated with ID: {} to {}", id, playerDto);
+                     playerMapper.mapDtoToDao(playerDto));
+
+            log.info("Player updated with ID: {} to {}", player.getId(), playerDto);
 
         } catch (Exception ex) {
             log.error(ex.getMessage());
@@ -200,14 +198,19 @@ public class PlayerServiceImp implements PlayerService {
     }
 
 
+    /**
+     * Populate database from csv file
+     * @param file file
+     * @return a list of elements persisted
+     */
     @Override
     public List<PlayerDto> parseCSVFileToPlayers(@NonNull MultipartFile file) {
 
         List<PlayerDto> result = new ArrayList<>();
+
         try (Reader reader = new BufferedReader(new InputStreamReader(file.getInputStream()))) {
 
             List<PlayerDto> parseResult = CSVParser.parse(reader, PlayerDto.class);
-
             parseResult.forEach(dto -> {
                 try {
                     Long id = dto.getId();
@@ -218,7 +221,6 @@ public class PlayerServiceImp implements PlayerService {
                     } else  {
                         update(dto);
                     }
-
                     result.add(dto);
                 } catch (Exception ex) {
                     log.error("{} can't be stored in the database due to: \n\t{}", dto, ex.getMessage());
