@@ -1,7 +1,6 @@
 package com.example.tareaspring;
 
 
-import com.example.tareaspring.models.*;
 import com.example.tareaspring.services.PlayerService;
 import com.example.tareaspring.services.SigningService;
 import com.example.tareaspring.services.TeamService;
@@ -10,7 +9,6 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ApplicationContext;
 
 import java.time.LocalDate;
-import java.util.*;
 
 @SpringBootApplication
 public class TareaSpringApplication {

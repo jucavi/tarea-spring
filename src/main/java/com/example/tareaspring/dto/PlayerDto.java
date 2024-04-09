@@ -1,6 +1,5 @@
 package com.example.tareaspring.dto;
 
-import com.example.tareaspring.dto.converter.PlayerMapper;
 import com.example.tareaspring.models.FieldPosition;
 import com.example.tareaspring.models.Gender;
 import com.example.tareaspring.utils.validators.anotations.CustomDateFormat;
@@ -11,7 +10,6 @@ import lombok.*;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.validation.constraints.*;
-import java.time.LocalDate;
 
 @Setter
 @Getter

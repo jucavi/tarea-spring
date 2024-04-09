@@ -3,19 +3,21 @@ package com.example.tareaspring.utils;
 // TODO: Merge with DateUtilsValidations
 
 import com.example.tareaspring.errors.DateFormatException;
-import lombok.extern.log4j.Log4j2;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeFormatterBuilder;
 
 /**
  * Common task for dates manipulation and validations
  */
 public class DateUtils {
 
+    /**
+     * Convert to Local date from string with format passed as parameter.
+     * @param strDate string date representation
+     * @param formatter formatter. Default {@code DateTimeFormatter.ISO_LOCAL_DATE}
+     * @return local date
+     */
     public static LocalDate fromStringToLocaldate(String strDate, DateTimeFormatter formatter) {
 
         LocalDate localDate;
@@ -33,6 +35,13 @@ public class DateUtils {
         return localDate;
     }
 
+
+    /**
+     * Convert from local date to string representation with pattern passed as parameter
+     * @param localDate local date
+     * @param pattern string pattern. Default {@code "yyyy-MM-dd"}
+     * @return string representation of {@code local date}
+     */
     public static String fromSLocalDateToString(LocalDate localDate, String pattern) {
 
         String strDate;
