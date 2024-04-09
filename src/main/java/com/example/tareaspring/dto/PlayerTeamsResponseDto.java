@@ -12,7 +12,7 @@ import java.time.LocalDate;
 @Builder
 public class PlayerTeamsResponseDto {
 
-    private Team team;
+    private TeamDto team;
     private LocalDate since;
     private LocalDate until;
     private Integer squadNumber;

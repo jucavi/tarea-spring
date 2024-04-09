@@ -20,10 +20,12 @@ public class TeamDto {
     private Long id;
 
     @CsvBindByName(required = true)
+    @NotNull
     @NotBlank(message = "Team name can't be blank")
     private String name;
 
     @CsvBindByName(required = true)
+    @NotNull
     @Pattern(regexp = "^[a-zA-Z0-9_!#$%&'*+=?`{|}~^.-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{1,4}$", message = "Email address must be valid")
     private String email;
 
@@ -33,6 +35,7 @@ public class TeamDto {
     private String since;
 
     @CsvBindByName(required = true)
+    @NotNull
     @NotBlank(message = "City name can't be blank")
     private String city;
 }

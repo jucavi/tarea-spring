@@ -9,6 +9,11 @@ import com.example.tareaspring.dto.converter.TeamMapper;
 import com.example.tareaspring.errors.DateFormatException;
 import com.example.tareaspring.errors.PlayerNotFoundException;
 import com.example.tareaspring.services.PlayerServiceImp;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.tags.Tags;
+import jdk.jfr.Description;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -24,6 +29,7 @@ import java.util.stream.Collectors;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/players")
+@Tag(name = "Players")
 public class PlayerController {
 
     private final PlayerServiceImp service;
@@ -35,6 +41,8 @@ public class PlayerController {
      * Get all players from database
      */
     @GetMapping
+    @Operation(summary = "All players", description = "Retrieve all teams from database")
+    @ApiResponse(description = "Whatever it does", responseCode = "200")
     public ResponseEntity<List<PlayerDto>> findAll() {
         return ResponseEntity.ok(
                 service.findAll()

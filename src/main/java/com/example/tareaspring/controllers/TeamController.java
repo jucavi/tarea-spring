@@ -6,7 +6,11 @@ import com.example.tareaspring.dto.TeamPlayerResponseDto;
 import com.example.tareaspring.dto.converter.TeamMapper;
 import com.example.tareaspring.errors.DateFormatException;
 import com.example.tareaspring.errors.TeamNotFoundException;
+import com.example.tareaspring.models.Player;
 import com.example.tareaspring.services.TeamServiceImp;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.tags.Tags;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -22,6 +26,7 @@ import java.util.stream.Collectors;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/teams")
+@Tag(name = "Teams")
 public class TeamController {
 
     private final TeamServiceImp service;
@@ -32,6 +37,7 @@ public class TeamController {
      * Get all teams from database
      */
     @GetMapping
+    @Operation(summary = "All teams", description = "Retrieve all teams from database")
     public ResponseEntity<List<TeamDto>> findAll() {
         return ResponseEntity.ok(
                 service.findAll()
@@ -83,7 +89,7 @@ public class TeamController {
      * @return {@code true} if a team was deleted, {@code 404 } not found
      */
     @DeleteMapping("/{id}")
-    public ResponseEntity<Boolean> delete(@PathVariable Long id) {
+    public ResponseEntity<?> delete(@PathVariable Long id) {
         service.deleteById(id);
         return ResponseEntity.ok().build();
     }
@@ -104,23 +110,6 @@ public class TeamController {
     @GetMapping("/{id}/signings/players/all")
     public ResponseEntity<List<PlayerDto>> findTeasByPlayerId(@PathVariable Long id) {
         return ResponseEntity.ok(service.getTeamSigningsPlayers(id));
-    }
-
-    /**
-     * Find players where has signed for a team at {@code date} passed as parameter
-     */
-    @GetMapping("/{id}/signings/players/at")
-    public ResponseEntity<List<TeamPlayerResponseDto>> findSigningsByTeamIdAt(
-            @PathVariable Long id,
-            @RequestParam @NonNull String date) throws DateFormatException {
-        try {
-
-            LocalDate localDate = LocalDate.parse(date);
-            return ResponseEntity.ok(service.getSigningsAtDate(id, localDate));
-
-        } catch (DateTimeParseException ex) {
-            throw new DateFormatException("Invalid Date format (yyyy-MM-dd)");
-        }
     }
 
 

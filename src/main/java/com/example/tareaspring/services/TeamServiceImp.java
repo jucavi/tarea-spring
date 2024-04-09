@@ -135,7 +135,7 @@ public class TeamServiceImp implements TeamService {
                 .stream()
                 .map(s ->
                         TeamPlayerResponseDto.builder()
-                                .player(s.getPlayer())
+                                .player(playerMapper.mapDaoToDto(s.getPlayer()))
                                 .since(s.getSince())
                                 .until(s.getUntil())
                                 .squadNumber(s.getSquadNumber())
@@ -187,7 +187,7 @@ public class TeamServiceImp implements TeamService {
                 )
                 .map(s ->
                     TeamPlayerResponseDto.builder()
-                            .player(s.getPlayer())
+                            .player(playerMapper.mapDaoToDto(s.getPlayer()))
                             .since(s.getSince())
                             .until(s.getUntil())
                             .squadNumber(s.getSquadNumber())

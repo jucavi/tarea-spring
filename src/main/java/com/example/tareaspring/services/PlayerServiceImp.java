@@ -3,6 +3,7 @@ package com.example.tareaspring.services;
 import com.example.tareaspring.dto.PlayerDto;
 import com.example.tareaspring.dto.PlayerTeamsResponseDto;
 import com.example.tareaspring.dto.converter.PlayerMapper;
+import com.example.tareaspring.dto.converter.TeamMapper;
 import com.example.tareaspring.errors.CreateEntityException;
 import com.example.tareaspring.errors.DatabaseSaveException;
 import com.example.tareaspring.errors.PlayerNotFoundException;
@@ -36,6 +37,7 @@ public class PlayerServiceImp implements PlayerService {
 
     private final PlayerRepository repository;
     private final PlayerMapper playerMapper;
+    private final TeamMapper teamMapper;
 
 
     /**
@@ -135,7 +137,7 @@ public class PlayerServiceImp implements PlayerService {
                 .stream()
                 .map(s ->
                         PlayerTeamsResponseDto.builder()
-                                .team(s.getTeam())
+                                .team(teamMapper.mapDaoToDto(s.getTeam()))
                                 .since(s.getSince())
                                 .until(s.getUntil())
                                 .squadNumber(s.getSquadNumber())
@@ -182,7 +184,7 @@ public class PlayerServiceImp implements PlayerService {
                 )
                 .map(s ->
                         PlayerTeamsResponseDto.builder()
-                                .team(s.getTeam())
+                                .team(teamMapper.mapDaoToDto(s.getTeam()))
                                 .since(s.getSince())
                                 .until(s.getUntil())
                                 .squadNumber(s.getSquadNumber())

@@ -4,6 +4,7 @@ import com.example.tareaspring.dto.SigningDto;
 import com.example.tareaspring.dto.converter.SigningMapper;
 import com.example.tareaspring.errors.SigningNotFoundException;
 import com.example.tareaspring.services.SigningServiceImp;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,6 +18,7 @@ import java.util.stream.Collectors;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/signings")
+@Tag(name = "Contracts")
 public class SigningController {
 
     private final SigningServiceImp service;
@@ -55,7 +57,6 @@ public class SigningController {
     @PostMapping
     // Validate Signing (since < until) in Entity
     public ResponseEntity<SigningDto> create(@RequestBody @Valid SigningDto signingDto) {
-        SigningDto dto = signingDto;
         return ResponseEntity.ok(
                 signingMapper.mapDaoToDto(
                         service.create(

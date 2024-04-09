@@ -22,14 +22,17 @@ public class PlayerDto {
     private Long id;
 
     @CsvBindByName(required = true)
+    @NotNull
     @NotBlank(message = "Player firstname can't be empty")
     private String firstname;
 
     @CsvBindByName(required = true)
+    @NotNull
     @NotBlank(message = "Player lastname can't be empty")
     private String lastname;
 
     @CsvBindByName(required = true)
+    @NotNull
     //    @Email(message = "Email address must be valid") // not check for blank message
     @Pattern(regexp = "^[a-zA-Z0-9_!#$%&'*+=?`{|}~^.-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{1,4}$", message = "Email address must be valid")
     private String email;
@@ -40,11 +43,13 @@ public class PlayerDto {
     private String birthdate;
 
     @CsvBindByName(required = true)
+    @NotNull
     @Enumerated(EnumType.STRING)
     @ValueOfEnum(enumClass = FieldPosition.class, message = "Position not allowed")
     private String position;
 
     @CsvBindByName(required = true)
+    @NotNull
     @Enumerated(EnumType.STRING)
     @ValueOfEnum(enumClass = Gender.class, message = "Gender not allowed")
     private String gender;
