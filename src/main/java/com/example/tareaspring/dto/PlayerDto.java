@@ -14,8 +14,8 @@ import javax.validation.constraints.*;
 @Setter
 @Getter
 @NoArgsConstructor
-@Builder
 @AllArgsConstructor
+@Builder
 public class PlayerDto {
 
     @CsvBindByName(required = true)
