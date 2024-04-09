@@ -5,12 +5,18 @@ import com.example.tareaspring.models.FieldPosition;
 import com.example.tareaspring.models.Gender;
 import com.example.tareaspring.models.Player;
 import com.example.tareaspring.utils.DateUtils;
-import org.springframework.stereotype.Component;
 
 // What's difference between @Component or create a @Bean
-
+/**
+ * Mapper DAO/DTO for Player
+ */
 public class PlayerMapper implements MapperInterface<Player, PlayerDto> {
 
+    /**
+     * Converts to DTO
+     * @param player instance of Player
+     * @return an instance of PlayerDto
+     */
     @Override
     public PlayerDto mapDaoToDto(Player player) {
         return PlayerDto.builder()
@@ -19,7 +25,7 @@ public class PlayerMapper implements MapperInterface<Player, PlayerDto> {
                 .lastname(player.getLastname())
                 .email(player.getEmail())
                 .birthdate(
-                        DateUtils.fromSLocalDateToString(player.getBirthdate(), null))
+                        DateUtils.fromLocalDateToString(player.getBirthdate(), null))
                 .position(player.getPosition().toString())
                 .gender(player.getGender().toString())
                 .imc(player.getImc())
@@ -29,6 +35,12 @@ public class PlayerMapper implements MapperInterface<Player, PlayerDto> {
                 .build();
     }
 
+
+    /**
+     * Converts to DAO
+     * @param playerDto  instance of Player
+     * @return an instance of PlayerDto
+     */
     @Override
     public Player mapDtoToDao(PlayerDto playerDto) {
         return Player.builder()
