@@ -3,6 +3,7 @@ package com.example.tareaspring.controllers;
 
 import com.example.tareaspring.dto.PlayerDto;
 import com.example.tareaspring.dto.PlayerTeamsResponseDto;
+import com.example.tareaspring.dto.converter.PlayerMapper;
 import com.example.tareaspring.errors.DateFormatException;
 import com.example.tareaspring.errors.PlayerNotFoundException;
 import com.example.tareaspring.models.Player;
@@ -26,7 +27,8 @@ import java.util.List;
 public class PlayerController {
 
     private final PlayerServiceImp service;
-    private final ModelMapper modelMapper;
+    //private final ModelMapper modelMapper;
+    private final PlayerMapper playerMapper;
 
 
     /**
@@ -55,7 +57,7 @@ public class PlayerController {
     @PostMapping
     public ResponseEntity<Player> create(@RequestBody @Valid PlayerDto playerDto) {
         return ResponseEntity.ok(
-                service.create(modelMapper.map(playerDto, Player.class))
+                service.create(playerMapper.mapDtoToDao(playerDto))
         );
     }
 
@@ -66,7 +68,7 @@ public class PlayerController {
     @PutMapping
     public ResponseEntity<Player> update(@RequestBody @Valid  PlayerDto playerDto) {
         return ResponseEntity.ok(
-            service.update(modelMapper.map(playerDto, Player.class))
+            service.update(playerMapper.mapDtoToDao(playerDto))
         );
     }
 
