@@ -1,11 +1,8 @@
 package com.example.tareaspring.services;
 
 import com.example.tareaspring.dto.SigningCSV;
-import com.example.tareaspring.dto.converter.TeamMapper;
 import com.example.tareaspring.errors.*;
-import com.example.tareaspring.models.Player;
 import com.example.tareaspring.models.Signing;
-import com.example.tareaspring.models.Team;
 import com.example.tareaspring.repositories.SigningRepository;
 import com.example.tareaspring.utils.parsers.CSVParser;
 
@@ -29,9 +26,6 @@ import java.util.Optional;
 public class SigningServiceImp implements SigningService {
 
     private final SigningRepository repository;
-    private final PlayerService playerService;
-    private final TeamService teamService;
-    private final TeamMapper teamMapper;
 
 
     @Override
@@ -96,9 +90,9 @@ public class SigningServiceImp implements SigningService {
         }
 
         // If foreign keys changed
-        if (oldSigning.getPlayer().getId()
+        if (!oldSigning.getPlayer().getId()
                     .equals(signing.getPlayer().getId())
-                || oldSigning.getTeam().getId()
+                || !oldSigning.getTeam().getId()
                     .equals(signing.getTeam().getId())) {
 
             throw new DatabaseSaveException("Foreign keys can't be changed");
@@ -152,16 +146,15 @@ public class SigningServiceImp implements SigningService {
      * Delete Signing by id
      */
     @Override
-    public Boolean deleteById(Long id) {
+    public void deleteById(Long id) {
 
         if (repository.existsById(id)) {
             repository.deleteById(id);
             log.info("Signing deleted with ID: {}", id);
-            return true;
+            return;
         }
 
         log.warn("Trying to delete a Signing with wrong ID");
-        return false;
     }
 
 
@@ -228,13 +221,7 @@ public class SigningServiceImp implements SigningService {
             @NonNull LocalDate since,
             @NonNull LocalDate until) {
 
-        Optional<Player> playerOpt = playerService.findById(playerId);
-
-        if (playerOpt.isEmpty()) {
-            throw new PlayerNotFoundException(playerId);
-        }
-
-        List<Signing> signings = playerOpt.get().getSignings();
+        List<Signing> signings = repository.findByPlayerId(playerId);
 
         for (Signing s : signings) {
             LocalDate currentSince = s.getSince();
@@ -265,13 +252,7 @@ public class SigningServiceImp implements SigningService {
             @NonNull LocalDate since,
             @NonNull LocalDate until) {
 
-        Optional<Team> teamOpt = teamService.findById(teamId);
-
-        if (teamOpt.isEmpty()) {
-            throw new TeamNotFoundException(teamId);
-        }
-
-        List<Signing> signings = teamOpt.get().getSignings();
+        List<Signing> signings = repository.findByTeamId(teamId);
 
         // user can be signed by team, but active signing and isPlayerNotSignedAt -> false
         for (Signing s : signings) {
@@ -345,13 +326,7 @@ public class SigningServiceImp implements SigningService {
             @NonNull LocalDate since,
             @NonNull LocalDate until) {
 
-        Optional<Player> playerOpt = playerService.findById(playerId);
-
-        if (playerOpt.isEmpty()) {
-            throw new PlayerNotFoundException(playerId);
-        }
-
-        List<Signing> signings = playerOpt.get().getSignings();
+        List<Signing> signings = repository.findByPlayerId(playerId);
 
         for (Signing s : signings) {
             LocalDate currentSince = s.getSince();

@@ -1,17 +1,20 @@
 package com.example.tareaspring.controllers;
 
+import com.example.tareaspring.dto.SigningDto;
+import com.example.tareaspring.dto.converter.SigningMapper;
 import com.example.tareaspring.errors.SigningNotFoundException;
 import com.example.tareaspring.models.Signing;
 import com.example.tareaspring.services.SigningServiceImp;
 import lombok.RequiredArgsConstructor;
-import org.modelmapper.ModelMapper;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 
 import javax.validation.Valid;
+import java.sql.SQLOutput;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequiredArgsConstructor
@@ -19,7 +22,7 @@ import java.util.List;
 public class SigningController {
 
     private final SigningServiceImp service;
-    private final ModelMapper modelMapper;
+    private final SigningMapper signingMapper;
 
 
     /**
@@ -27,8 +30,12 @@ public class SigningController {
      * @return all signing from the database
      */
     @GetMapping
-    public ResponseEntity<List<Signing>> findAll() {
-        return ResponseEntity.ok(service.findAll());
+    public ResponseEntity<List<SigningDto>> findAll() {
+        return ResponseEntity.ok(
+                service.findAll()
+                        .stream()
+                        .map(signingMapper::mapDaoToDto)
+                        .collect(Collectors.toList()));
     }
 
     /**
@@ -37,8 +44,9 @@ public class SigningController {
      * @return signing record if exists, otherwise {@code 404 } not found
      */
     @GetMapping("/{id}")
-    public ResponseEntity<Signing> findById(@PathVariable Long id) {
+    public ResponseEntity<SigningDto> findById(@PathVariable Long id) {
         return service.findById(id)
+                .map(signingMapper::mapDaoToDto)
                 .map(ResponseEntity::ok)
                 .orElseThrow(() -> new SigningNotFoundException(id));
     }
@@ -47,22 +55,25 @@ public class SigningController {
      * Create a Signing in the database
      */
     @PostMapping
-    public ResponseEntity<Signing> create(@RequestBody @Valid Signing signing) {
+    // Validate Signing (since < until) in Entity
+    public ResponseEntity<SigningDto> create(@RequestBody @Valid SigningDto signingDto) {
+        SigningDto dto = signingDto;
         return ResponseEntity.ok(
-                service.create(signing)
-        );
+                signingMapper.mapDaoToDto(
+                        service.create(
+                                signingMapper.mapDtoToDao(signingDto))));
     }
 
     /**
      * Update signing info
-     * @param signing signing
-     * @return signing if updated, otherwise {@code 404 } not found
      */
     @PutMapping
-    public ResponseEntity<Signing> update(@RequestBody @Valid  Signing signing) {
+    // Validate Signing (since < until) in Entity
+    public ResponseEntity<SigningDto> update(@RequestBody @Valid  SigningDto signingDto) {
         return ResponseEntity.ok(
-                service.update(signing)
-        );
+                signingMapper.mapDaoToDto(
+                        service.update(
+                                signingMapper.mapDtoToDao(signingDto))));
     }
 
     /**
@@ -71,7 +82,7 @@ public class SigningController {
      * @return {@code true} if a signing was deleted, {@code 404 } not found
      */
     @DeleteMapping("/{id}")
-    public ResponseEntity<Boolean> delete(@PathVariable Long id) {
+    public ResponseEntity<?> delete(@PathVariable Long id) {
         service.deleteById(id);
         return ResponseEntity.ok().build();
     }

@@ -15,7 +15,7 @@ import javax.validation.constraints.NotNull;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@DateRange(before = "since", after = "until", message = "Until date must be greater then since date")
+//@DateRange(before = "since", after = "until", message = "Until date must be greater then since date")
 public class SigningDto {
 
     @CsvBindByName(required = true)

@@ -17,6 +17,6 @@ public interface SigningRepository extends JpaRepository<Signing, Long> {
 
     List<Signing> findByPlayer(Player player);
     List<Signing> findByTeam(Team team);
-    Optional<Team> findByTeamId(Long id);
-    Optional<Player> findByPlayerId(Long id);
+    List<Signing> findByTeamId(Long teamId);
+    List<Signing> findByPlayerId(Long playerId);
 }

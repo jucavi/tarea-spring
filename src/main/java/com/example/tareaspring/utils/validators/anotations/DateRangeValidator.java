@@ -18,6 +18,7 @@ public class DateRangeValidator implements ConstraintValidator<DateRange, Object
 
     @Override
     public boolean isValid(final Object value, ConstraintValidatorContext context) {
+
         try {
             final Field beforeDateField = value.getClass().getDeclaredField(beforeFieldName);
             beforeDateField.setAccessible(true);
