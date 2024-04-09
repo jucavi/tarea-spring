@@ -92,9 +92,7 @@ public class SigningController {
      * @return List of signings persisted, otherwise an empty list
      */
     @PostMapping("/upload")
-    public ResponseEntity<List<Signing>> upload(@RequestParam("file") MultipartFile file) {
-        List<Signing> result =  service.parseCSVFileToSignings(file);
-
-        return ResponseEntity.ok(result);
+    public ResponseEntity<List<SigningDto>> upload(@RequestParam("file") MultipartFile file) {
+        return ResponseEntity.ok(service.parseCSVFileToSignings(file));
     }
 }

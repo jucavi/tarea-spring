@@ -208,13 +208,11 @@ public class PlayerServiceImp implements PlayerService {
             parseResult.forEach(dto -> {
                 try {
                     Long id = dto.getId();
-
                     Player player = playerMapper.mapDtoToDao(dto);
 
-                    // If id rewrite
                     if (id == null) {
                         create(player);
-                    } else  {
+                    } else  { // If id rewrite
                         update(player);
                     }
                     result.add(dto);
@@ -224,7 +222,7 @@ public class PlayerServiceImp implements PlayerService {
             });
 
         } catch (Exception ex) {
-            log.error("Unable to read csv file.");
+            log.error("Unable to read csv file: " + ex.getMessage());
         }
 
         return result;

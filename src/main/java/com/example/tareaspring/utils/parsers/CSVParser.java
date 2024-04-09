@@ -22,13 +22,14 @@ public class CSVParser {
      *
      * @param reader csv reader
      * @param mapToClass class to be mapped
-     * @return list of objects
      * @param <T> class to convert the objects to.
+     * @return list of objects
      */
     public static <T> List<T> parse(Reader reader, Class<T> mapToClass) {
 
         CsvToBean<T> csvToBean = new CsvToBeanBuilder<T>(reader)
                 .withIgnoreLeadingWhiteSpace(true)
+                .withThrowExceptions(true)
                 .withType(mapToClass)
                 .build();
 

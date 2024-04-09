@@ -1,6 +1,7 @@
 package com.example.tareaspring.services;
 
-import com.example.tareaspring.dto.SigningCSV;
+import com.example.tareaspring.dto.SigningDto;
+import com.example.tareaspring.dto.converter.SigningMapper;
 import com.example.tareaspring.errors.*;
 import com.example.tareaspring.models.Signing;
 import com.example.tareaspring.repositories.SigningRepository;
@@ -26,7 +27,7 @@ import java.util.Optional;
 public class SigningServiceImp implements SigningService {
 
     private final SigningRepository repository;
-
+    private final SigningMapper signingMapper;
 
     @Override
     public List<Signing> findAll() {
@@ -163,38 +164,37 @@ public class SigningServiceImp implements SigningService {
      * Parse csv file to DAO
      */
     @Override
-    public List<Signing> parseCSVFileToSignings(@NonNull MultipartFile file) {
+    public List<SigningDto> parseCSVFileToSignings(@NonNull MultipartFile file) {
 
-        List<Signing> signings = new ArrayList<>();
+        List<SigningDto> result = new ArrayList<>();
 
         // TODO: Refactor to Generic
         try (Reader reader = new BufferedReader(new InputStreamReader(file.getInputStream()))) {
 
-            List<SigningCSV> result = CSVParser.parse(reader, SigningCSV.class);
+            List<SigningDto> parseResult = CSVParser.parse(reader, SigningDto.class);
 
-            result.forEach((signingCsv -> {
+            parseResult.forEach((dto -> {
                 try {
-                    Signing signing = signingCsv.mapToDao();
-                    Long id = signing.getId();
+                    Long id = dto.getId();
+                    Signing signing = signingMapper.mapDtoToDao(dto);
 
                     if (id == null) {
                         create(signing);
-                    } else  { // Si el csv viene con id se sobreescribe
+                    } else  { // if id rewrite
                         update(signing);
                     }
 
-                    //repository.save(signing);
-                    signings.add(signing);
+                    result.add(dto);
                 } catch (Exception ex) {
-                    log.error("{} can't be stored in the database due to: \n\t{}", signingCsv, ex.getMessage());
+                    log.error("{} can't be stored in the database due to: \n\t{}", dto, ex.getMessage());
                 }
             }));
 
         } catch (Exception ex) {
-            log.error("Unable to read csv file.");
+            log.error("Unable to read csv file: " + ex.getMessage());
         }
 
-        return signings;
+        return result;
     }
 
     /**

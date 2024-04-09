@@ -38,6 +38,7 @@ public class SigningDto {
     @CustomDateFormat(message = "Invalid date, pattern required (YYYY-MM-DD)")
     private String until;
 
+    @CsvBindByName(required = true)
     @NotNull
     @Min(value = 0, message = "Squad number should be greater or equal than 0")
     @Max(value = 99, message = "Squad number should be lesser or equal than 99")

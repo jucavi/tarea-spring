@@ -229,7 +229,7 @@ public class TeamServiceImp implements TeamService {
             }));
 
         } catch (Exception ex) {
-            log.error("Unable to read csv file.");
+            log.error("Unable to read csv file: " + ex.getMessage());
         }
 
         return result;
