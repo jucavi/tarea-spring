@@ -4,22 +4,16 @@ import com.example.tareaspring.dto.PlayerDto;
 import com.example.tareaspring.dto.TeamDto;
 import com.example.tareaspring.dto.TeamPlayerResponseDto;
 import com.example.tareaspring.dto.converter.TeamMapper;
-import com.example.tareaspring.errors.DateFormatException;
 import com.example.tareaspring.errors.TeamNotFoundException;
-import com.example.tareaspring.models.Player;
 import com.example.tareaspring.services.TeamServiceImp;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import io.swagger.v3.oas.annotations.tags.Tags;
-import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
-import java.time.LocalDate;
-import java.time.format.DateTimeParseException;
 import java.util.List;
 import java.util.stream.Collectors;
 

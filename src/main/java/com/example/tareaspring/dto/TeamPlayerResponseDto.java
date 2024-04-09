@@ -1,6 +1,5 @@
 package com.example.tareaspring.dto;
 
-import com.example.tareaspring.models.Player;
 import lombok.*;
 
 import java.time.LocalDate;

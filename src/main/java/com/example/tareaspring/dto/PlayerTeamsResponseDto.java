@@ -1,6 +1,5 @@
 package com.example.tareaspring.dto;
 
-import com.example.tareaspring.models.Team;
 import lombok.*;
 
 import java.time.LocalDate;
