@@ -1,6 +1,7 @@
 package com.example.tareaspring.config;
 
 import com.example.tareaspring.dto.converter.PlayerMapper;
+import com.example.tareaspring.dto.converter.TeamMapper;
 import org.modelmapper.ModelMapper;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -16,5 +17,10 @@ public class CustomAppConfiguration {
     @Bean
     public PlayerMapper playerMapper() {
         return new PlayerMapper();
+    }
+
+    @Bean
+    public TeamMapper teamMapper() {
+        return new TeamMapper();
     }
 }
