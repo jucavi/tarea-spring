@@ -42,7 +42,7 @@ public class DateUtils {
      * @param pattern string pattern. Default {@code "yyyy-MM-dd"}
      * @return string representation of {@code local date}
      */
-    public static String fromSLocalDateToString(LocalDate localDate, String pattern) {
+    public static String fromLocalDateToString(LocalDate localDate, String pattern) {
 
         String strDate;
 
