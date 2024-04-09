@@ -3,7 +3,6 @@ package com.example.tareaspring.controllers;
 import com.example.tareaspring.dto.SigningDto;
 import com.example.tareaspring.dto.converter.SigningMapper;
 import com.example.tareaspring.errors.SigningNotFoundException;
-import com.example.tareaspring.models.Signing;
 import com.example.tareaspring.services.SigningServiceImp;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
