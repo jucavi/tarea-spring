@@ -3,8 +3,6 @@ package com.example.tareaspring.services;
 import com.example.tareaspring.dto.PlayerDto;
 import com.example.tareaspring.dto.TeamDto;
 import com.example.tareaspring.dto.TeamPlayerResponseDto;
-import com.example.tareaspring.models.Player;
-import com.example.tareaspring.models.Team;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
