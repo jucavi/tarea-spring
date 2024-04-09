@@ -345,7 +345,7 @@ public class TeamServiceImp implements TeamService {
                     Team team = teamCsv.mapToDao();
                     Long id = team.getId();
 
-                    // Si el csv viene con id sobreescribe
+                    // with id: then rewrite
                     if (id == null) {
                         create(team);
                     } else  {
