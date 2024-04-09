@@ -9,12 +9,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+
 import javax.validation.Valid;
 import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("api/v1/signings")
+@RequestMapping("/signings")
 public class SigningController {
 
     private final SigningServiceImp service;
@@ -47,9 +48,6 @@ public class SigningController {
      */
     @PostMapping
     public ResponseEntity<Signing> create(@RequestBody @Valid Signing signing) {
-//        return ResponseEntity.ok(
-//                service.create(modelMapper.map(signingDto, Signing.class))
-//        );
         return ResponseEntity.ok(
                 service.create(signing)
         );
@@ -62,7 +60,9 @@ public class SigningController {
      */
     @PutMapping
     public ResponseEntity<Signing> update(@RequestBody @Valid  Signing signing) {
-        throw new RuntimeException("not implemented yet");
+        return ResponseEntity.ok(
+                service.update(signing)
+        );
     }
 
     /**
@@ -72,13 +72,8 @@ public class SigningController {
      */
     @DeleteMapping("/{id}")
     public ResponseEntity<Boolean> delete(@PathVariable Long id) {
-        Boolean result = service.deleteById(id);
-
-        if (result) {
-            return ResponseEntity.ok(true);
-        }
-
-        return ResponseEntity.notFound().build();
+        service.deleteById(id);
+        return ResponseEntity.ok().build();
     }
 
     /**

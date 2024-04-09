@@ -77,25 +77,71 @@ public class SigningServiceImp implements SigningService {
     public Signing update(Signing signing) {
 
         if (signing.getId() == null) {
+
             throw new CreateEntityException("Error, trying to update signing with ID: null");
         }
 
-        // id's cant be changed
-        // the player have contract and a number
+        Long id = signing.getId();
 
-        // number can be change if not present if newNumber != new number check
-        // can modify a contract if lo permiten los restantes del jugador
+        Optional<Signing> oldSigningOpt = repository.findById(id);
+        Signing oldSigning;
 
-        if (isValidSigning(signing)) {
-            try {
-                repository.save(signing);
-            } catch (Exception ex) {
-                throw new DatabaseSaveException("Unable to create in database: " + signing);
-            }
-            return signing;
+        if (!oldSigningOpt.isPresent()) {
+            signing.setId(null);
+            return create(signing);
+        } else {
+            oldSigning = oldSigningOpt.get();
         }
 
-        throw new ValidSigningException("Unable to create invalid signing in database: " + signing);
+        // If foreign keys changed
+        if (oldSigning.getPlayer().getId() != signing.getPlayer().getId()
+                || oldSigning.getTeam().getId() != signing.getTeam().getId()) {
+
+            throw new DatabaseSaveException("Foreign keys can't be changed");
+      }
+
+    boolean isValidSquadNumber = true;
+
+        if (!oldSigning.getSquadNumber()
+                .equals(signing.getSquadNumber())) {
+
+        isValidSquadNumber = isValidSquadNumberAt(
+                signing.getTeam().getId(),
+                signing.getSquadNumber(),
+                signing.getSince(),
+                signing.getUntil());
+    }
+
+    boolean isValidDateRange = true;
+
+        // if limits range change
+        if (!oldSigning.getSince()
+                .isEqual(signing.getSince())
+            || !oldSigning.getUntil()
+                .equals(signing.getUntil())) {
+
+            isValidDateRange = isSigningCanBeModified(
+                    signing.getPlayer().getId(),
+                    id,
+                    signing.getSince(),
+                    signing.getUntil());
+        }
+
+        if (isValidSquadNumber && isValidDateRange) {
+            try {
+                Signing result = repository.save(signing);
+
+                log.info("Signing updated with ID: {} to {}", id, signing);
+
+                return result;
+            } catch (Exception ex) {
+                log.error(ex.getMessage());
+                throw new DatabaseSaveException("Unable to update signing: " + signing);
+            }
+
+        }
+
+        throw new ValidSigningException("Unable to update invalid signing in database: " + signing);
     }
 
     /**
@@ -115,6 +161,7 @@ public class SigningServiceImp implements SigningService {
     }
 
 
+    // TODO: Refactor to
     /**
      * Parse csv file to DAO
      */
@@ -122,22 +169,24 @@ public class SigningServiceImp implements SigningService {
     public List<Signing> parseCSVFileToSignings(@NonNull MultipartFile file) {
 
         List<Signing> signings = new ArrayList<>();
+
+        // TODO: Refactor to Generic
         try (Reader reader = new BufferedReader(new InputStreamReader(file.getInputStream()))) {
 
             List<SigningCSV> result = CSVParser.parse(reader, SigningCSV.class);
+
             result.forEach((signingCsv -> {
                 try {
                     Signing signing = signingCsv.mapToDao();
                     Long id = signing.getId();
 
-                    // Si el csv viene con id sobreescribe
                     if (id == null) {
                         create(signing);
-                    } else  {
+                    } else  { // Si el csv viene con id se sobreescribe
                         update(signing);
                     }
 
-                    repository.save(signing);
+                    //repository.save(signing);
                     signings.add(signing);
                 } catch (Exception ex) {
                     log.error("{} can't be stored in the database due to: \n\t{}", signingCsv, ex.getMessage());
@@ -187,8 +236,10 @@ public class SigningServiceImp implements SigningService {
             LocalDate currentSince = s.getSince();
             LocalDate currentUntil = s.getUntil();
 
+            // TODO: CHANGE FOR: DateUtilsValidator.isDateInRange(s.getSince(), s.getUntil(), date)
             boolean isSinceDateIn = isDateInRangeInclusive(currentSince, currentUntil, since);
             boolean isUntilDateIn = isDateInRangeInclusive(currentSince, currentUntil, until);
+            // TODO: MOVE TO DateUtilsValidator
             boolean isBiggerRange = isDateRangeSubset(currentSince, currentUntil, since, until);
 
             if (isSinceDateIn || isUntilDateIn || isBiggerRange) {
@@ -225,6 +276,7 @@ public class SigningServiceImp implements SigningService {
             LocalDate currentUntil = s.getUntil();
 
             // if date in any contract check squad number
+            // TODO: CHANGE FOR: DateUtilsValidator.isDateInRange(s.getSince(), s.getUntil(), date)
             boolean isSinceDateIn = isDateInRangeInclusive(currentSince, currentUntil, since);
             boolean isUntilDateIn = isDateInRangeInclusive(currentSince, currentUntil, until);
             boolean isBiggerRange = isDateRangeSubset(currentSince, currentUntil, since, until);
@@ -251,8 +303,14 @@ public class SigningServiceImp implements SigningService {
             @NonNull LocalDate date) {
 
         // if date between [startDate, endDate]
-        return (startDate.isBefore(date) || startDate.isEqual(date))
-                && (endDate.isAfter(date) || endDate.isEqual(date));
+        // Could be separated in different messages
+        if ((startDate.isBefore(date) || startDate.isEqual(date))
+                && (endDate.isAfter(date) || endDate.isEqual(date))) {
+                    return true;
+        }
+
+        log.warn("Range date no valid");
+        return false;
     }
 
     /**
@@ -265,7 +323,50 @@ public class SigningServiceImp implements SigningService {
             @NonNull LocalDate until) {
 
         // if both edges in [since, until] is at least a subset
-        return isDateInRangeInclusive(since, until, startDate)
-                && isDateInRangeInclusive(since, until, endDate);
+        if (isDateInRangeInclusive(since, until, startDate)
+                && isDateInRangeInclusive(since, until, endDate)) {
+            return true;
+        }
+
+        log.warn("Range date no valid");
+        return false;
+    }
+
+    /**
+     * Checck if player signing date can be modified
+     */
+    private Boolean isSigningCanBeModified(
+            @NonNull Long playerId,
+            @NonNull Long signingId,
+            @NonNull LocalDate since,
+            @NonNull LocalDate until) {
+
+        Optional<Player> playerOpt = playerService.findById(playerId);
+
+        if (playerOpt.isEmpty()) {
+            throw new PlayerNotFoundException(playerId);
+        }
+
+        List<Signing> signings = playerOpt.get().getSignings();
+
+        for (Signing s : signings) {
+            LocalDate currentSince = s.getSince();
+            LocalDate currentUntil = s.getUntil();
+
+            boolean isSinceDateIn = isDateInRangeInclusive(currentSince, currentUntil, since);
+            boolean isUntilDateIn = isDateInRangeInclusive(currentSince, currentUntil, until);
+            boolean isBiggerRange = isDateRangeSubset(currentSince, currentUntil, since, until);
+
+            // all signings excluding the one we want to modify
+            if (!s.getId().equals(signingId)) {
+
+                if (isSinceDateIn || isUntilDateIn || isBiggerRange) {
+                    log.warn("Player can't sign due to contract boundaries");
+                    return false;
+                }
+            }
+        }
+
+        return true;
     }
 }

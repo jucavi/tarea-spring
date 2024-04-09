@@ -35,7 +35,7 @@ public class SigningCSV implements CsvDtoInterface<Signing> {
     @CsvDate(value = "yyyy-MM-dd")
     private LocalDate until;
 
-    @CsvBindByName
+    @CsvBindByName(required = true)
     private Integer squadNumber;
 
     @Override

@@ -1,12 +1,10 @@
 package com.example.tareaspring.controllers;
 
-import com.example.tareaspring.dto.SigningDto;
 import com.example.tareaspring.dto.TeamDto;
 import com.example.tareaspring.dto.TeamPlayerResponseDto;
 import com.example.tareaspring.errors.DateFormatException;
 import com.example.tareaspring.errors.TeamNotFoundException;
 import com.example.tareaspring.models.Player;
-import com.example.tareaspring.models.Signing;
 import com.example.tareaspring.models.Team;
 import com.example.tareaspring.services.TeamServiceImp;
 import lombok.NonNull;
@@ -23,7 +21,7 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("api/v1/teams")
+@RequestMapping("/teams")
 public class TeamController {
 
     private final TeamServiceImp service;
@@ -121,18 +119,6 @@ public class TeamController {
         }
     }
 
-    /**
-     * Create a signing
-     */
-    // TODO
-    @PostMapping("/{id}/signings/players/{playerId}/create")
-    public ResponseEntity<Signing> createSigning(
-            @RequestBody @Valid SigningDto signingDto,
-            @PathVariable Long id,
-            @PathVariable Long playerId) {
-
-        return ResponseEntity.ok(modelMapper.map(signingDto, Signing.class));
-    }
 
     /**
      * Persist all registries from csv file into database
