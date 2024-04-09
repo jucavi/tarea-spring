@@ -1,39 +1,43 @@
 package com.example.tareaspring.dto;
 
-import com.example.tareaspring.models.Player;
-import com.example.tareaspring.models.Team;
+
+import com.example.tareaspring.utils.validators.anotations.CustomDateFormat;
 import com.example.tareaspring.utils.validators.anotations.DateRange;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import org.springframework.format.annotation.DateTimeFormat;
+import com.opencsv.bean.CsvBindByName;
+import lombok.*;
 
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
-import java.time.LocalDate;
 
 @Setter
 @Getter
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
 @DateRange(before = "since", after = "until", message = "Until date must be greater then since date")
 public class SigningDto {
 
+    @CsvBindByName(required = true)
     private Long id;
 
+    @CsvBindByName(required = true)
     @NotNull
-    private Player player;
+    private Long playerId;
 
+    @CsvBindByName(required = true)
     @NotNull
-    private Team team;
+    private Long teamId;
 
+    @CsvBindByName(required = true)
     @NotNull
-    @DateTimeFormat(pattern = "yyyy-MM-dd")
-    private LocalDate since;
+    @CustomDateFormat(message = "Invalid date, pattern required (YYYY-MM-DD)")
+    private String since;
 
+    @CsvBindByName(required = true)
     @NotNull
-    @DateTimeFormat(pattern = "yyyy-MM-dd")
-    private LocalDate until;
+    @CustomDateFormat(message = "Invalid date, pattern required (YYYY-MM-DD)")
+    private String until;
 
     @NotNull
     @Min(value = 0, message = "Squad number should be greater or equal than 0")

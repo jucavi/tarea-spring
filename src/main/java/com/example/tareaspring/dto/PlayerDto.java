@@ -36,7 +36,7 @@ public class PlayerDto {
 
     @CsvBindByName(required = true)
     @NotNull
-    @CustomDateFormat(message = "Invalid date, pattern required YYYY-MM-DD")
+    @CustomDateFormat(message = "Invalid date, pattern required (YYYY-MM-DD)")
     private String birthdate;
 
     @CsvBindByName(required = true)
