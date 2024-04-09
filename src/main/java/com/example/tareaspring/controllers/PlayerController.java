@@ -3,15 +3,14 @@ package com.example.tareaspring.controllers;
 
 import com.example.tareaspring.dto.PlayerDto;
 import com.example.tareaspring.dto.PlayerTeamsResponseDto;
+import com.example.tareaspring.dto.TeamDto;
 import com.example.tareaspring.dto.converter.PlayerMapper;
+import com.example.tareaspring.dto.converter.TeamMapper;
 import com.example.tareaspring.errors.DateFormatException;
 import com.example.tareaspring.errors.PlayerNotFoundException;
-import com.example.tareaspring.models.Player;
-import com.example.tareaspring.models.Team;
 import com.example.tareaspring.services.PlayerServiceImp;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import org.modelmapper.ModelMapper;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -20,6 +19,7 @@ import javax.validation.Valid;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequiredArgsConstructor
@@ -27,8 +27,8 @@ import java.util.List;
 public class PlayerController {
 
     private final PlayerServiceImp service;
-    //private final ModelMapper modelMapper;
     private final PlayerMapper playerMapper;
+    private final TeamMapper teamMapper;
 
 
     /**
@@ -36,7 +36,11 @@ public class PlayerController {
      */
     @GetMapping
     public ResponseEntity<List<PlayerDto>> findAll() {
-        return ResponseEntity.ok(service.findAll());
+        return ResponseEntity.ok(
+                service.findAll()
+                        .stream()
+                        .map(playerMapper::mapDaoToDto)
+                        .collect(Collectors.toList()));
     }
 
 
@@ -46,6 +50,7 @@ public class PlayerController {
     @GetMapping("/{id}")
     public ResponseEntity<PlayerDto> findById(@PathVariable Long id) {
         return service.findById(id)
+                .map(playerMapper::mapDaoToDto)
                 .map(ResponseEntity::ok)
                 .orElseThrow(() -> new PlayerNotFoundException(id));
     }
@@ -57,8 +62,9 @@ public class PlayerController {
     @PostMapping
     public ResponseEntity<PlayerDto> create(@RequestBody @Valid PlayerDto playerDto) {
         return ResponseEntity.ok(
-                service.create(playerDto)
-        );
+                playerMapper.mapDaoToDto(
+                        service.create(
+                                playerMapper.mapDtoToDao(playerDto))));
     }
 
 
@@ -68,8 +74,9 @@ public class PlayerController {
     @PutMapping
     public ResponseEntity<PlayerDto> update(@RequestBody @Valid  PlayerDto playerDto) {
         return ResponseEntity.ok(
-            service.update(playerDto)
-        );
+                playerMapper.mapDaoToDto(
+                        service.update(
+                                playerMapper.mapDtoToDao(playerDto))));
     }
 
 
@@ -88,7 +95,6 @@ public class PlayerController {
      */
     @GetMapping("/{id}/signings")
     public ResponseEntity<List<PlayerTeamsResponseDto>> findSigningsByPlayerId(@PathVariable Long id) {
-
         return ResponseEntity.ok(service.getUserSignings(id));
     }
 
@@ -97,9 +103,12 @@ public class PlayerController {
      * Find all the teams where a player has played
      */
     @GetMapping("/{id}/signings/teams/all")
-    public ResponseEntity<List<Team>> findTeasByPlayerId(@PathVariable Long id) {
-
-        return ResponseEntity.ok(service.getUserSigningsTeams(id));
+    public ResponseEntity<List<TeamDto>> findTeasByPlayerId(@PathVariable Long id) {
+        return ResponseEntity.ok(
+                service.getUserSigningsTeams(id)
+                        .stream()
+                        .map(teamMapper::mapDaoToDto)
+                        .collect(Collectors.toList()));
     }
 
 
@@ -124,8 +133,6 @@ public class PlayerController {
      */
     @PostMapping("/upload")
     public ResponseEntity<List<PlayerDto>> upload(@RequestParam("file") MultipartFile file) {
-        List<PlayerDto> result =  service.parseCSVFileToPlayers(file);
-
-        return ResponseEntity.ok(result);
+        return ResponseEntity.ok(service.parseCSVFileToPlayers(file));
     }
 }

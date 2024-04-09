@@ -1,9 +1,7 @@
 package com.example.tareaspring.services;
 
-import com.example.tareaspring.dto.PlayerDto;
 import com.example.tareaspring.dto.SigningCSV;
 import com.example.tareaspring.dto.TeamDto;
-import com.example.tareaspring.dto.converter.PlayerMapper;
 import com.example.tareaspring.dto.converter.TeamMapper;
 import com.example.tareaspring.errors.*;
 import com.example.tareaspring.models.Player;
@@ -34,7 +32,6 @@ public class SigningServiceImp implements SigningService {
     private final SigningRepository repository;
     private final PlayerService playerService;
     private final TeamService teamService;
-    private final PlayerMapper playerMapper;
     private final TeamMapper teamMapper;
 
 
@@ -100,8 +97,10 @@ public class SigningServiceImp implements SigningService {
         }
 
         // If foreign keys changed
-        if (oldSigning.getPlayer().getId() != signing.getPlayer().getId()
-                || oldSigning.getTeam().getId() != signing.getTeam().getId()) {
+        if (oldSigning.getPlayer().getId()
+                    .equals(signing.getPlayer().getId())
+                || oldSigning.getTeam().getId()
+                    .equals(signing.getTeam().getId())) {
 
             throw new DatabaseSaveException("Foreign keys can't be changed");
       }
@@ -230,15 +229,13 @@ public class SigningServiceImp implements SigningService {
             @NonNull LocalDate since,
             @NonNull LocalDate until) {
 
-        Optional<PlayerDto> playerOpt = playerService.findById(playerId);
+        Optional<Player> playerOpt = playerService.findById(playerId);
 
         if (playerOpt.isEmpty()) {
             throw new PlayerNotFoundException(playerId);
         }
 
-        Player player = playerMapper.mapDtoToDao(playerOpt.get());
-
-        List<Signing> signings = player.getSignings();
+        List<Signing> signings = playerOpt.get().getSignings();
 
         for (Signing s : signings) {
             LocalDate currentSince = s.getSince();
@@ -351,14 +348,13 @@ public class SigningServiceImp implements SigningService {
             @NonNull LocalDate since,
             @NonNull LocalDate until) {
 
-        Optional<PlayerDto> playerOpt = playerService.findById(playerId);
+        Optional<Player> playerOpt = playerService.findById(playerId);
 
         if (playerOpt.isEmpty()) {
             throw new PlayerNotFoundException(playerId);
         }
 
-        Player player = playerMapper.mapDtoToDao(playerOpt.get());
-        List<Signing> signings = player.getSignings();
+        List<Signing> signings = playerOpt.get().getSignings();
 
         for (Signing s : signings) {
             LocalDate currentSince = s.getSince();

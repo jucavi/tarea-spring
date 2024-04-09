@@ -43,46 +43,41 @@ public class PlayerServiceImp implements PlayerService {
      * @return list of players in the database
      */
     @Override
-    public List<PlayerDto> findAll() {
+    public List<Player> findAll() {
         log.info("Retrieving all players from database");
-        return repository.findAll()
-                .stream()
-                .map(playerMapper::mapDaoToDto)
-                .collect(Collectors.toList());
+        return repository.findAll();
     }
 
     /**
      * Find player by ID
      */
     @Override
-    public Optional<PlayerDto> findById(Long id) {
+    public Optional<Player> findById(Long id) {
         log.info("Retrieving player with ID: {}", id);
-        return repository.findById(id)
-                .map(playerMapper::mapDaoToDto);
+        return repository.findById(id);
     }
 
     /**
      * Create player in database
      */
     @Override
-    public PlayerDto create(PlayerDto playerDto) {
+    public Player create(Player player) {
 
-        if (playerDto.getId() != null) {
+        if (player.getId() != null) {
             throw new CreateEntityException("Trying to create a player, but ID not null");
         }
 
-        Player player;
+        Player result;
         try {
-             player = repository.save(
-                    playerMapper.mapDtoToDao(playerDto));
+             result = repository.save(player);
 
-            log.info("Player created with ID: {}", player.getId());
+            log.info("Player created with ID: {}", result.getId());
 
         } catch (Exception ex) {
             log.error(ex.getMessage());
             throw new DatabaseSaveException("Unable to create a player");
         }
-        return playerMapper.mapDaoToDto(player);
+        return result;
     }
 
 
@@ -90,25 +85,24 @@ public class PlayerServiceImp implements PlayerService {
      * Update player in database
      */
     @Override
-    public PlayerDto update(PlayerDto playerDto) {
+    public Player update(Player player) {
 
-        if (playerDto.getId() == null) {
+        if (player.getId() == null) {
             throw new CreateEntityException("Error, trying to update player with ID: null");
         }
 
-        Player player;
+        Player result;
         try {
-             player = repository.save(
-                     playerMapper.mapDtoToDao(playerDto));
+             result = repository.save(player);
 
-            log.info("Player updated with ID: {} to {}", player.getId(), playerDto);
+            log.info("Player updated with ID: {} to {}", result.getId(), player);
 
         } catch (Exception ex) {
             log.error(ex.getMessage());
-            throw new DatabaseSaveException("Unable to update player: " + playerDto);
+            throw new DatabaseSaveException("Unable to update player: " + player);
         }
 
-        return playerMapper.mapDaoToDto(player);
+        return result;
     }
 
     /**
@@ -215,11 +209,13 @@ public class PlayerServiceImp implements PlayerService {
                 try {
                     Long id = dto.getId();
 
-                    // Si el csv viene con id sobreescribe
+                    Player player = playerMapper.mapDtoToDao(dto);
+
+                    // If id rewrite
                     if (id == null) {
-                        create(dto);
+                        create(player);
                     } else  {
-                        update(dto);
+                        update(player);
                     }
                     result.add(dto);
                 } catch (Exception ex) {
