@@ -41,12 +41,9 @@ public class TeamServiceImp implements TeamService {
      * @return list of teams in the database
      */
     @Override
-    public List<TeamDto> findAll() {
+    public List<Team> findAll() {
         log.info("Retrieving all Teams from database");
-        return repository.findAll()
-                .stream()
-                .map(teamMapper::mapDaoToDto)
-                .collect(Collectors.toList());
+        return repository.findAll();
     }
 
 
@@ -54,10 +51,9 @@ public class TeamServiceImp implements TeamService {
      * Find team by id
      */
     @Override
-    public Optional<TeamDto> findById(Long id) {
+    public Optional<Team> findById(Long id) {
         log.info("Retrieving team with ID: {}", id);
-        return repository.findById(id)
-                .map(teamMapper::mapDaoToDto);
+        return repository.findById(id);
     }
 
 
@@ -65,50 +61,48 @@ public class TeamServiceImp implements TeamService {
      * Create a team
      */
     @Override
-    public TeamDto create(TeamDto teamDto) {
+    public Team create(Team team) {
 
-        if (teamDto.getId() != null) {
+        if (team.getId() != null) {
             throw new CreateEntityException("Trying to create a team, but ID not null");
         }
 
-        Team team;
+        Team result;
         try {
-            team = repository.save(
-                    teamMapper.mapDtoToDao(teamDto));
+             result = repository.save(team);
 
-            log.info("Team created with ID: {}", team.getId());
+            log.info("Team created with ID: {}", result.getId());
 
         } catch (Exception ex) {
             log.error(ex.getMessage());
             throw new DatabaseSaveException("Unable to create a team");
         }
 
-        return teamMapper.mapDaoToDto(team);
+        return result;
     }
 
     /**
      * Update team in database
      */
     @Override
-    public TeamDto update(TeamDto teamDto) {
+    public Team update(Team team) {
 
-        if (teamDto.getId() == null) {
-            throw new CreateEntityException("Error, trying to update team with ID: null");
+        if (team.getId() == null) {
+            throw new CreateEntityException("Error, trying to update result with ID: null");
         }
 
-        Team team;
+        Team result;
         try {
-             team = repository.save(
-                    teamMapper.mapDtoToDao(teamDto));
+             result = repository.save(team);
 
-            log.info("Team updated with ID: {} to {}", team.getId(), team);
+            log.info("Team updated with ID: {} to {}", result.getId(), team);
 
         } catch (Exception ex) {
             log.error(ex.getMessage());
-            throw new DatabaseSaveException("Unable to update player: " + teamDto);
+            throw new DatabaseSaveException("Unable to update player: " + team);
         }
 
-        return teamMapper.mapDaoToDto(team);
+        return result;
     }
 
     /**
@@ -220,11 +214,13 @@ public class TeamServiceImp implements TeamService {
                 try {
                     Long id = dto.getId();
 
+                    Team team = teamMapper.mapDtoToDao(dto);
+
                     // with id: then rewrite
                     if (id == null) {
-                        create(dto);
+                        create(team);
                     } else  {
-                        update(dto);
+                        update(team);
                     }
                     result.add(dto);
                 } catch (Exception ex) {

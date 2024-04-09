@@ -3,6 +3,7 @@ package com.example.tareaspring.controllers;
 import com.example.tareaspring.dto.PlayerDto;
 import com.example.tareaspring.dto.TeamDto;
 import com.example.tareaspring.dto.TeamPlayerResponseDto;
+import com.example.tareaspring.dto.converter.TeamMapper;
 import com.example.tareaspring.errors.DateFormatException;
 import com.example.tareaspring.errors.TeamNotFoundException;
 import com.example.tareaspring.services.TeamServiceImp;
@@ -16,6 +17,7 @@ import javax.validation.Valid;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequiredArgsConstructor
@@ -23,6 +25,7 @@ import java.util.List;
 public class TeamController {
 
     private final TeamServiceImp service;
+    private final TeamMapper teamMapper;
 
 
     /**
@@ -30,7 +33,11 @@ public class TeamController {
      */
     @GetMapping
     public ResponseEntity<List<TeamDto>> findAll() {
-        return ResponseEntity.ok(service.findAll());
+        return ResponseEntity.ok(
+                service.findAll()
+                        .stream()
+                        .map(teamMapper::mapDaoToDto)
+                        .collect(Collectors.toList()));
     }
 
 
@@ -40,6 +47,7 @@ public class TeamController {
     @GetMapping("/{id}")
     public ResponseEntity<TeamDto> findById(@PathVariable Long id) {
         return service.findById(id)
+                .map(teamMapper::mapDaoToDto)
                 .map(ResponseEntity::ok)
                 .orElseThrow(() -> new TeamNotFoundException(id));
     }
@@ -51,8 +59,9 @@ public class TeamController {
     @PostMapping
     public ResponseEntity<TeamDto> create(@RequestBody @Valid TeamDto teamDto) {
         return ResponseEntity.ok(
-                service.create(teamDto)
-        );
+                teamMapper.mapDaoToDto(
+                        service.create(
+                                teamMapper.mapDtoToDao(teamDto))));
     }
 
 
@@ -62,8 +71,9 @@ public class TeamController {
     @PutMapping
     public ResponseEntity<TeamDto> update(@RequestBody @Valid TeamDto teamDto) {
         return ResponseEntity.ok(
-                service.update(teamDto)
-        );
+                teamMapper.mapDaoToDto(
+                        service.update(
+                                teamMapper.mapDtoToDao(teamDto))));
     }
 
 
@@ -84,7 +94,6 @@ public class TeamController {
      */
     @GetMapping("/{id}/signings")
     public ResponseEntity<List<TeamPlayerResponseDto>> findSigningsByPlayerId(@PathVariable Long id) {
-
         return ResponseEntity.ok(service.getTeamSignings(id));
     }
 
@@ -94,7 +103,6 @@ public class TeamController {
      */
     @GetMapping("/{id}/signings/players/all")
     public ResponseEntity<List<PlayerDto>> findTeasByPlayerId(@PathVariable Long id) {
-
         return ResponseEntity.ok(service.getTeamSigningsPlayers(id));
     }
 
@@ -123,8 +131,6 @@ public class TeamController {
      */
     @PostMapping("/upload")
     public ResponseEntity<List<TeamDto>> upload(@RequestParam("file") MultipartFile file) {
-        List<TeamDto> result =  service.parseCSVFileToTeams(file);
-
-        return ResponseEntity.ok(result);
+        return ResponseEntity.ok(service.parseCSVFileToTeams(file));
     }
 }
