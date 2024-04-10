@@ -174,9 +174,6 @@ public class PlayerServiceImp implements PlayerService {
 
     /**
      * Return current signing at date if exists
-     * @param id
-     * @param date
-     * @return
      */
     @Override
     public List<PlayerTeamsResponseDto> findByPlayerIdSigningAtDate(Long id, LocalDate date) {

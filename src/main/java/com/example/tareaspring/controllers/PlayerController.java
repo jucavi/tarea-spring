@@ -5,7 +5,6 @@ import com.example.tareaspring.dto.PlayerDto;
 import com.example.tareaspring.dto.PlayerTeamsResponseDto;
 import com.example.tareaspring.dto.TeamDto;
 import com.example.tareaspring.dto.converter.PlayerMapper;
-import com.example.tareaspring.dto.converter.TeamMapper;
 import com.example.tareaspring.errors.DateFormatException;
 import com.example.tareaspring.services.PlayerServiceImp;
 import io.swagger.v3.oas.annotations.Operation;
@@ -30,7 +29,6 @@ public class PlayerController {
 
     private final PlayerServiceImp service;
     private final PlayerMapper playerMapper;
-    private final TeamMapper teamMapper;
 
 
     /**
@@ -108,9 +106,8 @@ public class PlayerController {
      * Find team where a player has signed at {@code date} passed as parameter
      */
     @GetMapping("/{id}/signings/teams/at")
-    public ResponseEntity<List<PlayerTeamsResponseDto>> findByPlayerIdSigningAtDate(@PathVariable Long id, @RequestParam @NonNull String date) throws DateFormatException {
+    public ResponseEntity<List<PlayerTeamsResponseDto>> findByPlayerIdSigningAtDate(@PathVariable Long id, @RequestParam @NonNull String date) {
         try {
-
             LocalDate localDate = LocalDate.parse(date);
             return ResponseEntity.ok(service.findByPlayerIdSigningAtDate(id, localDate));
 
