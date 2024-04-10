@@ -78,4 +78,21 @@ public class DateUtils {
 
         return isAfterOrEqualSince && isBeforeOrEqualUntil;
     }
+
+    /**
+     * Check if [starDate, endDate] is included in [since, until]
+     */
+    public static boolean isRangeDateSubset(
+            LocalDate startDate,
+            LocalDate endDate,
+            LocalDate since,
+            LocalDate until) {
+
+        // if both edges in
+        //                   [since,                until]
+        //                      [startDate,  endDate]
+        // is at least a subset
+        return (isDateInRange(since, until, startDate)
+                && isDateInRange(since, until, endDate));
+    }
 }

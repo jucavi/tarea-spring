@@ -11,10 +11,10 @@ import java.util.List;
 import java.util.Optional;
 
 public interface TeamService {
-    List<Team> findAll();
-    Optional<Team> findById(Long id);
-    Team create(Team team);
-    Team update(Team team);
+    List<TeamDto> findAll();
+    TeamDto findById(Long id);
+    TeamDto create(Team team);
+    TeamDto update(Team team);
     void deleteById(Long id);
     List<TeamDto> parseCSVFileToTeams(MultipartFile file);
     List<TeamPlayerResponseDto> getTeamSignings(Long id);

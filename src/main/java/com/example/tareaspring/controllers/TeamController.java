@@ -4,7 +4,6 @@ import com.example.tareaspring.dto.PlayerDto;
 import com.example.tareaspring.dto.TeamDto;
 import com.example.tareaspring.dto.TeamPlayerResponseDto;
 import com.example.tareaspring.dto.converter.TeamMapper;
-import com.example.tareaspring.errors.TeamNotFoundException;
 import com.example.tareaspring.services.TeamServiceImp;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -15,7 +14,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @RequiredArgsConstructor
@@ -35,9 +33,7 @@ public class TeamController {
     public ResponseEntity<List<TeamDto>> findAll() {
         return ResponseEntity.ok(
                 service.findAll()
-                        .stream()
-                        .map(teamMapper::mapDaoToDto)
-                        .collect(Collectors.toList()));
+);
     }
 
 
@@ -46,10 +42,7 @@ public class TeamController {
      */
     @GetMapping("/{id}")
     public ResponseEntity<TeamDto> findById(@PathVariable Long id) {
-        return service.findById(id)
-                .map(teamMapper::mapDaoToDto)
-                .map(ResponseEntity::ok)
-                .orElseThrow(() -> new TeamNotFoundException(id));
+        return ResponseEntity.ok(service.findById(id));
     }
 
 
@@ -58,10 +51,8 @@ public class TeamController {
      */
     @PostMapping
     public ResponseEntity<TeamDto> create(@RequestBody @Valid TeamDto teamDto) {
-        return ResponseEntity.ok(
-                teamMapper.mapDaoToDto(
-                        service.create(
-                                teamMapper.mapDtoToDao(teamDto))));
+        return ResponseEntity.ok(service.create(
+                teamMapper.mapDtoToDao(teamDto)));
     }
 
 
@@ -70,10 +61,8 @@ public class TeamController {
      */
     @PutMapping
     public ResponseEntity<TeamDto> update(@RequestBody @Valid TeamDto teamDto) {
-        return ResponseEntity.ok(
-                teamMapper.mapDaoToDto(
-                        service.update(
-                                teamMapper.mapDtoToDao(teamDto))));
+        return ResponseEntity.ok(service.update(
+                teamMapper.mapDtoToDao(teamDto)));
     }
 
 

@@ -56,6 +56,7 @@ public class PlayerServiceImp implements PlayerService {
      */
     @Override
     public PlayerDto findById(Long id) {
+
         log.info("Retrieving player with ID: {}", id);
 
         Optional<Player> player = repository.findById(id);

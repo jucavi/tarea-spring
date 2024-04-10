@@ -10,9 +10,9 @@ import java.util.Optional;
 public interface SigningService {
 
     List<SigningDto> parseCSVFileToSignings(MultipartFile file);
-    List<Signing> findAll();
-    Optional<Signing> findById(Long id);
-    Signing create(Signing Signing);
-    Signing update(Signing Signing);
+    List<SigningDto> findAll();
+    SigningDto findById(Long id);
+    SigningDto create(Signing Signing);
+    SigningDto update(Signing Signing);
     void deleteById(Long id);
 }

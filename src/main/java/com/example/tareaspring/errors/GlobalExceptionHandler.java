@@ -75,7 +75,8 @@ public class GlobalExceptionHandler {
             CreateEntityException.class,
             MissingServletRequestParameterException.class,
             DataIntegrityViolationException.class,
-            DatabaseSaveException.class
+            DatabaseSaveException.class,
+            DateFormatException.class
     })
     public ResponseEntity<ApiError> handleDateFormatException(Exception ex) {
 

@@ -41,9 +41,12 @@ public class TeamServiceImp implements TeamService {
      * @return list of teams in the database
      */
     @Override
-    public List<Team> findAll() {
+    public List<TeamDto> findAll() {
         log.info("Retrieving all Teams from database");
-        return repository.findAll();
+        return repository.findAll()
+                .stream()
+                .map(teamMapper::mapDaoToDto)
+                .collect(Collectors.toList());
     }
 
 
@@ -51,9 +54,16 @@ public class TeamServiceImp implements TeamService {
      * Find team by id
      */
     @Override
-    public Optional<Team> findById(Long id) {
+    public TeamDto findById(Long id) {
+
         log.info("Retrieving team with ID: {}", id);
-        return repository.findById(id);
+
+        Optional<Team> team = repository.findById(id);
+
+        if (team.isEmpty()) {
+            throw new TeamNotFoundException(id);
+        }
+        return teamMapper.mapDaoToDto(team.get());
     }
 
 
@@ -61,7 +71,7 @@ public class TeamServiceImp implements TeamService {
      * Create a team
      */
     @Override
-    public Team create(Team team) {
+    public TeamDto create(Team team) {
 
         if (team.getId() != null) {
             throw new CreateEntityException("Trying to create a team, but ID not null");
@@ -78,14 +88,14 @@ public class TeamServiceImp implements TeamService {
             throw new DatabaseSaveException("Unable to create a team");
         }
 
-        return result;
+        return teamMapper.mapDaoToDto(result);
     }
 
     /**
      * Update team in database
      */
     @Override
-    public Team update(Team team) {
+    public TeamDto update(Team team) {
 
         if (team.getId() == null) {
             throw new CreateEntityException("Error, trying to update result with ID: null");
@@ -102,7 +112,7 @@ public class TeamServiceImp implements TeamService {
             throw new DatabaseSaveException("Unable to update player: " + team);
         }
 
-        return result;
+        return teamMapper.mapDaoToDto(result);
     }
 
     /**

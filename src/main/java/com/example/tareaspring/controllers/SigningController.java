@@ -31,11 +31,7 @@ public class SigningController {
      */
     @GetMapping
     public ResponseEntity<List<SigningDto>> findAll() {
-        return ResponseEntity.ok(
-                service.findAll()
-                        .stream()
-                        .map(signingMapper::mapDaoToDto)
-                        .collect(Collectors.toList()));
+        return ResponseEntity.ok(service.findAll());
     }
 
     /**
@@ -45,10 +41,7 @@ public class SigningController {
      */
     @GetMapping("/{id}")
     public ResponseEntity<SigningDto> findById(@PathVariable Long id) {
-        return service.findById(id)
-                .map(signingMapper::mapDaoToDto)
-                .map(ResponseEntity::ok)
-                .orElseThrow(() -> new SigningNotFoundException(id));
+        return ResponseEntity.ok(service.findById(id));
     }
 
     /**
@@ -57,10 +50,8 @@ public class SigningController {
     @PostMapping
     // Validate Signing (since < until) in Entity
     public ResponseEntity<SigningDto> create(@RequestBody @Valid SigningDto signingDto) {
-        return ResponseEntity.ok(
-                signingMapper.mapDaoToDto(
-                        service.create(
-                                signingMapper.mapDtoToDao(signingDto))));
+        return ResponseEntity.ok(service.create(
+                signingMapper.mapDtoToDao(signingDto)));
     }
 
     /**
@@ -69,10 +60,8 @@ public class SigningController {
     @PutMapping
     // Validate Signing (since < until) in Entity
     public ResponseEntity<SigningDto> update(@RequestBody @Valid  SigningDto signingDto) {
-        return ResponseEntity.ok(
-                signingMapper.mapDaoToDto(
-                        service.update(
-                                signingMapper.mapDtoToDao(signingDto))));
+        return ResponseEntity.ok(service.update(
+                signingMapper.mapDtoToDao(signingDto)));
     }
 
     /**
