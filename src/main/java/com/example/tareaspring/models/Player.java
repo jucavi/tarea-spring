@@ -53,7 +53,7 @@ public class Player {
     private Integer fat;
 
     @JsonIgnore
-    @OneToMany(mappedBy = "player", fetch = FetchType.EAGER, cascade = CascadeType.REMOVE)
+    @OneToMany(mappedBy = "player", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
     List<Signing> signings;
 
 

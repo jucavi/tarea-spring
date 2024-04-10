@@ -7,7 +7,6 @@ import com.example.tareaspring.dto.TeamDto;
 import com.example.tareaspring.dto.converter.PlayerMapper;
 import com.example.tareaspring.dto.converter.TeamMapper;
 import com.example.tareaspring.errors.DateFormatException;
-import com.example.tareaspring.errors.PlayerNotFoundException;
 import com.example.tareaspring.services.PlayerServiceImp;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -22,7 +21,6 @@ import javax.validation.Valid;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @RequiredArgsConstructor
@@ -42,11 +40,7 @@ public class PlayerController {
     @Operation(summary = "All players", description = "Retrieve all teams from database")
     @ApiResponse(description = "Whatever it does", responseCode = "200")
     public ResponseEntity<List<PlayerDto>> findAll() {
-        return ResponseEntity.ok(
-                service.findAll()
-                        .stream()
-                        .map(playerMapper::mapDaoToDto)
-                        .collect(Collectors.toList()));
+        return ResponseEntity.ok(service.findAll());
     }
 
 
@@ -55,10 +49,7 @@ public class PlayerController {
      */
     @GetMapping("/{id}")
     public ResponseEntity<PlayerDto> findById(@PathVariable Long id) {
-        return service.findById(id)
-                .map(playerMapper::mapDaoToDto)
-                .map(ResponseEntity::ok)
-                .orElseThrow(() -> new PlayerNotFoundException(id));
+        return ResponseEntity.ok(service.findById(id));
     }
 
 
@@ -68,9 +59,8 @@ public class PlayerController {
     @PostMapping
     public ResponseEntity<PlayerDto> create(@RequestBody @Valid PlayerDto playerDto) {
         return ResponseEntity.ok(
-                playerMapper.mapDaoToDto(
-                        service.create(
-                                playerMapper.mapDtoToDao(playerDto))));
+                    service.create(
+                            playerMapper.mapDtoToDao(playerDto)));
     }
 
 
@@ -80,9 +70,8 @@ public class PlayerController {
     @PutMapping
     public ResponseEntity<PlayerDto> update(@RequestBody @Valid  PlayerDto playerDto) {
         return ResponseEntity.ok(
-                playerMapper.mapDaoToDto(
                         service.update(
-                                playerMapper.mapDtoToDao(playerDto))));
+                                playerMapper.mapDtoToDao(playerDto)));
     }
 
 
@@ -100,21 +89,18 @@ public class PlayerController {
      * Find all signings of a player from database
      */
     @GetMapping("/{id}/signings")
-    public ResponseEntity<List<PlayerTeamsResponseDto>> findSigningsByPlayerId(@PathVariable Long id) {
-        return ResponseEntity.ok(service.getUserSignings(id));
+    public ResponseEntity<List<PlayerTeamsResponseDto>> findByPlayerIdAllSignings(@PathVariable Long id) {
+        return ResponseEntity.ok(service.findByPlayerIdAllSignings(id));
     }
 
 
     /**
      * Find all the teams where a player has played
      */
-    @GetMapping("/{id}/signings/teams/all")
-    public ResponseEntity<List<TeamDto>> findTeasByPlayerId(@PathVariable Long id) {
+    @GetMapping("/{id}/signings/teams")
+    public ResponseEntity<List<TeamDto>> findByPlayerIdAllTeamsWerePlayerHasPlayed(@PathVariable Long id) {
         return ResponseEntity.ok(
-                service.getUserSigningsTeams(id)
-                        .stream()
-                        .map(teamMapper::mapDaoToDto)
-                        .collect(Collectors.toList()));
+                service.findByPlayerIdTeamsWerePlayerHasPlayed(id));
     }
 
 
@@ -122,11 +108,11 @@ public class PlayerController {
      * Find team where a player has signed at {@code date} passed as parameter
      */
     @GetMapping("/{id}/signings/teams/at")
-    public ResponseEntity<List<PlayerTeamsResponseDto>> findSigningsByPlayerIdAt(@PathVariable Long id, @RequestParam @NonNull String date) throws DateFormatException {
+    public ResponseEntity<List<PlayerTeamsResponseDto>> findByPlayerIdSigningAtDate(@PathVariable Long id, @RequestParam @NonNull String date) throws DateFormatException {
         try {
 
             LocalDate localDate = LocalDate.parse(date);
-            return ResponseEntity.ok(service.getUserSigningAtDate(id, localDate));
+            return ResponseEntity.ok(service.findByPlayerIdSigningAtDate(id, localDate));
 
         } catch (DateTimeParseException ex) {
             throw new DateFormatException("Invalid Date format (yyyy-MM-dd)");
