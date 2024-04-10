@@ -12,7 +12,7 @@ import java.util.List;
  * <pre>
  *     Usage:
  *          Reader reader = new BufferedReader(new InputStreamReader(csvFile.getInputStream()));
- *          List&#60;Pojo&#62; users = CSVParser(reader, Pojo.class);
+ *          List&#60;Pojo&#62; users = CSVParser.parse(reader, Pojo.class);
  * </pre>
  */
 public class CSVParser {
