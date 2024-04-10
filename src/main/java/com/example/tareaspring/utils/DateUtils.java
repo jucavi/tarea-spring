@@ -3,6 +3,7 @@ package com.example.tareaspring.utils;
 // TODO: Merge with DateUtilsValidations
 
 import com.example.tareaspring.errors.DateFormatException;
+import org.springframework.lang.NonNull;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -42,7 +43,7 @@ public class DateUtils {
      * @param pattern string pattern. Default {@code "yyyy-MM-dd"}
      * @return string representation of {@code local date}
      */
-    public static String fromLocalDateToString(LocalDate localDate, String pattern) {
+    public static String fromLocalDateToString(@NonNull LocalDate localDate, String pattern) {
 
         String strDate;
 
@@ -61,5 +62,20 @@ public class DateUtils {
         }
 
         return strDate;
+    }
+
+
+    /**
+     * Checks if date belongs to a range date
+     * @param startDate start date of the range
+     * @param endDate end date of a range
+     * @param date date to be checked
+     * @return if date belongs to range date {@code true}, otherwise {@code false}
+     */
+    public static boolean isDateInRange(@NonNull LocalDate startDate, @NonNull LocalDate endDate, @NonNull LocalDate date) {
+        boolean isAfterOrEqualSince = date.isAfter(startDate) || date.isEqual(startDate);
+        boolean isBeforeOrEqualUntil = date.isBefore(endDate) || date.isEqual(endDate);
+
+        return isAfterOrEqualSince && isBeforeOrEqualUntil;
     }
 }

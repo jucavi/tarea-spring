@@ -11,11 +11,12 @@ import com.example.tareaspring.models.Player;
 import com.example.tareaspring.models.Signing;
 import com.example.tareaspring.models.Team;
 import com.example.tareaspring.repositories.PlayerRepository;
+import com.example.tareaspring.utils.DateUtils;
 import com.example.tareaspring.utils.parsers.CSVParser;
 
-import com.example.tareaspring.utils.validators.utils.DateUtilsValidator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.modelmapper.ModelMapper;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -38,6 +39,7 @@ public class PlayerServiceImp implements PlayerService {
     private final PlayerRepository repository;
     private final PlayerMapper playerMapper;
     private final TeamMapper teamMapper;
+    private final ModelMapper modelMapper;
 
 
     /**
@@ -79,6 +81,8 @@ public class PlayerServiceImp implements PlayerService {
             log.error(ex.getMessage());
             throw new DatabaseSaveException("Unable to create a player");
         }
+
+        modelMapper.map(result, PlayerDto.class);
         return result;
     }
 
@@ -180,7 +184,7 @@ public class PlayerServiceImp implements PlayerService {
                 .stream()
                 .filter(s ->
                         // signings in range since <= date <= until
-                        DateUtilsValidator.isDateInRange(s.getSince(), s.getUntil(), date)
+                        DateUtils.isDateInRange(s.getSince(), s.getUntil(), date)
                 )
                 .map(s ->
                         PlayerTeamsResponseDto.builder()

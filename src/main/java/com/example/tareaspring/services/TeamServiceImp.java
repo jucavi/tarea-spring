@@ -9,8 +9,8 @@ import com.example.tareaspring.errors.*;
 import com.example.tareaspring.models.Signing;
 import com.example.tareaspring.models.Team;
 import com.example.tareaspring.repositories.TeamRepository;
+import com.example.tareaspring.utils.DateUtils;
 import com.example.tareaspring.utils.parsers.CSVParser;
-import com.example.tareaspring.utils.validators.utils.DateUtilsValidator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.lang.NonNull;
@@ -183,7 +183,7 @@ public class TeamServiceImp implements TeamService {
                 .stream()
                 .filter(s ->
                     // signings in range since <= date <= until
-                    DateUtilsValidator.isDateInRange(s.getSince(), s.getUntil(), date)
+                    DateUtils.isDateInRange(s.getSince(), s.getUntil(), date)
                 )
                 .map(s ->
                     TeamPlayerResponseDto.builder()
